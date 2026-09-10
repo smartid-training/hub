@@ -1740,3 +1740,13 @@ function enforceSupportHeader(){
     });
   }
 }
+
+function enforceFinalSupportHeader(){
+  if(currentRole!=="suport") return;
+  const b=document.getElementById("supportManageBtn");
+  if(b){b.style.display="none";b.classList.add("hidden");}
+  const r=document.getElementById("roleBadge");
+  if(r) r.textContent="SUPORT";
+  const n=document.getElementById("supportUserName");
+  if(n){n.textContent="";n.style.display="none";n.classList.add("hidden");}
+}
