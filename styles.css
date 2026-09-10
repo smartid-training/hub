@@ -2197,3 +2197,7 @@ body.role-suport #userRoleBadge,
 body.support-colleague-view #userRoleBadge{
   display:none !important;
 }
+
+/* Final header: management button beside SmartID Portal for authorised Support colleagues */
+.brand-row{display:flex;align-items:center;gap:16px;}
+.current-user-name{font-weight:800;white-space:nowrap;}

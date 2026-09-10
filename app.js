@@ -203,8 +203,7 @@ async function recordSession() {
 
 
 function configureAccountIdentity() {
-setTimeout(enforceSupportHeader,0);
-setTimeout(syncSupportColleagueLayout,0);
+setTimeout(applyFinalUserHeaderLayout,0);
   const badge = el("userRoleBadge");
   const hero = el("accountHero");
   const sidebarSubtitle = el("sidebarSubtitle");
@@ -1749,4 +1748,39 @@ function enforceFinalSupportHeader(){
   if(r) r.textContent="SUPORT";
   const n=document.getElementById("supportUserName");
   if(n){n.textContent="";n.style.display="none";n.classList.add("hidden");}
+}
+
+
+function applyFinalUserHeaderLayout(){
+  if(currentRole === "admin") return;
+  const badge=document.getElementById("userRoleBadge");
+  const userName=document.getElementById("currentUserName");
+  const manageBtn=document.getElementById("supportManageBtn");
+  const brandRow=document.querySelector(".brand-row");
+  const topActions=document.querySelector(".top-actions");
+  const pageHead=document.querySelector("#equipmentPage > .page-head");
+
+  // Pentru Carrefour, Franciza si Suport afisam in dreapta numele contului conectat.
+  if(badge) badge.classList.add("hidden");
+  if(userName){
+    userName.textContent=currentDisplayName || currentEmail || "Utilizator";
+    userName.classList.remove("hidden");
+    userName.style.display="inline-flex";
+  }
+
+  // Colegii Support care au drept de adaugare/gestionare primesc butonul in stanga.
+  if(manageBtn){
+    if(currentRole === "suport" && currentCanAdd){
+      if(brandRow && manageBtn.parentElement !== brandRow) brandRow.appendChild(manageBtn);
+      manageBtn.classList.remove("hidden");
+      manageBtn.style.display="inline-flex";
+    }else{
+      manageBtn.classList.add("hidden");
+      manageBtn.style.display="none";
+      if(topActions && manageBtn.parentElement !== topActions) topActions.insertBefore(manageBtn, document.getElementById("logoutBtn"));
+    }
+  }
+
+  // La userii simpli Carrefour/Franciza scoatem titlul mare repetat din stanga, deasupra cardului.
+  if(pageHead) pageHead.style.display=(currentRole === "carrefour" || currentRole === "franciza") ? "none" : "";
 }
