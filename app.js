@@ -214,11 +214,11 @@ setTimeout(syncSupportColleagueLayout,0);
 
   if (menuButton) menuButton.classList.toggle("hidden", currentRole !== "admin");
   if (userNameEl) {
-    userNameEl.textContent = currentRole === "suport" ? currentDisplayName : "";
-    userNameEl.classList.toggle("hidden", currentRole !== "suport" || !currentDisplayName);
+    userNameEl.textContent = "";
+    userNameEl.classList.add("hidden");
   }
   if (supportManageBtn) {
-    supportManageBtn.classList.toggle("hidden", currentRole !== "suport");
+    supportManageBtn.classList.add("hidden");
   }
 
   // Reset vizibilitate meniu.
@@ -1727,21 +1727,16 @@ function syncSupportColleagueLayout(){document.body.classList.toggle("support-co
 
 function enforceSupportHeader(){
   const manageBtn=document.getElementById("supportManageBtn");
-  const brandRow=document.querySelector(".topbar .brand-row");
-  const topActions=document.querySelector(".topbar .top-actions");
   const badge=document.getElementById("userRoleBadge");
-
+  const userName=document.getElementById("currentUserName");
   if(currentRole==="suport"){
-    // Support: Gestionare materiale in stanga, langa SmartID Portal.
-    if(manageBtn && brandRow && manageBtn.parentElement!==brandRow) brandRow.appendChild(manageBtn);
-    // Nu afisam eticheta SUPORT; ramane doar numele colegului logat in dreapta.
-    if(badge) badge.classList.add("hidden");
+    // Support arata ca ceilalti useri: doar rolul SUPORT, fara Gestionare materiale si fara numele colegului.
+    if(manageBtn) manageBtn.classList.add("hidden");
+    if(badge){ badge.textContent="SUPORT"; badge.dataset.role="suport"; badge.classList.remove("hidden"); }
+    if(userName) userName.classList.add("hidden");
     document.querySelectorAll("button").forEach(b=>{
       const t=(b.textContent||"").trim();
       if(t==="☰" || t==="≡" || t==="⋮" || t==="...") b.style.display="none";
     });
-  } else {
-    // Pentru celelalte roluri pastram structura existenta.
-    if(manageBtn && topActions && manageBtn.parentElement!==topActions) topActions.insertBefore(manageBtn, document.getElementById("logoutBtn"));
   }
 }
