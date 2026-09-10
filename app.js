@@ -1726,9 +1726,22 @@ function syncManageMaterialActions(){
 function syncSupportColleagueLayout(){document.body.classList.toggle("support-colleague-view",currentRole==="suport");}
 
 function enforceSupportHeader(){
-  if(currentRole!=="suport") return;
-  document.querySelectorAll("button").forEach(b=>{
-    const t=(b.textContent||"").trim();
-    if(t==="☰" || t==="≡" || t==="⋮" || t==="...") b.style.display="none";
-  });
+  const manageBtn=document.getElementById("supportManageBtn");
+  const brandRow=document.querySelector(".topbar .brand-row");
+  const topActions=document.querySelector(".topbar .top-actions");
+  const badge=document.getElementById("userRoleBadge");
+
+  if(currentRole==="suport"){
+    // Support: Gestionare materiale in stanga, langa SmartID Portal.
+    if(manageBtn && brandRow && manageBtn.parentElement!==brandRow) brandRow.appendChild(manageBtn);
+    // Nu afisam eticheta SUPORT; ramane doar numele colegului logat in dreapta.
+    if(badge) badge.classList.add("hidden");
+    document.querySelectorAll("button").forEach(b=>{
+      const t=(b.textContent||"").trim();
+      if(t==="☰" || t==="≡" || t==="⋮" || t==="...") b.style.display="none";
+    });
+  } else {
+    // Pentru celelalte roluri pastram structura existenta.
+    if(manageBtn && topActions && manageBtn.parentElement!==topActions) topActions.insertBefore(manageBtn, document.getElementById("logoutBtn"));
+  }
 }

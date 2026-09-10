@@ -2185,3 +2185,15 @@ body.support-colleague-view .support-top-label{
   cursor:pointer;
 }
 .support-manage-btn.hidden,.current-user-name.hidden{display:none!important}
+
+/* Header Support: Gestionare materiale in stanga; fara badge SUPORT */
+body.role-suport .brand-row,
+body.support-colleague-view .brand-row{
+  display:flex !important;
+  align-items:center !important;
+  gap:18px !important;
+}
+body.role-suport #userRoleBadge,
+body.support-colleague-view #userRoleBadge{
+  display:none !important;
+}
