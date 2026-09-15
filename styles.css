@@ -2198,6 +2198,40 @@ body.support-colleague-view #userRoleBadge{
   display:none !important;
 }
 
-/* Final header: management button beside SmartID Portal for authorised Support colleagues */
-.brand-row{display:flex;align-items:center;gap:16px;}
-.current-user-name{font-weight:800;white-space:nowrap;}
+
+/* ===== SMARTID PROD RC 15.09 ===== */
+.header-action-btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:8px 13px;border-radius:999px;border:1px solid rgba(168,85,247,.72);background:rgba(126,34,206,.18);color:#fff;font-weight:800;cursor:pointer;white-space:nowrap}.header-action-btn.hidden{display:none!important}.header-add-btn{border-color:rgba(34,197,94,.65);background:rgba(22,163,74,.16)}
+.brand-row{display:flex!important;align-items:center!important;gap:12px!important}
+/* Numele real al userului este întotdeauna în dreapta. Anulează regulile vechi care ascundeau badge-ul Support. */
+#userRoleBadge{display:inline-flex!important;align-items:center!important;max-width:220px;white-space:nowrap;overflow:visible!important;text-overflow:clip!important}
+#userRoleBadge.hidden{display:none!important}body.role-suport #userRoleBadge,body.support-colleague-view #userRoleBadge{display:inline-flex!important}
+/* Titlul duplicat din stânga nu se mai vede la user Carrefour/Franciză/Support. */
+body.role-carrefour #equipmentPage>.page-head,body.role-franciza #equipmentPage>.page-head,body.role-suport #equipmentPage>.page-head{display:none!important}
+/* Fundal identic în toate paginile și viewer. */
+.page,.viewer{background:radial-gradient(circle at 12% 8%,rgba(37,99,235,.12),transparent 25%),radial-gradient(circle at 88% 10%,rgba(139,92,246,.10),transparent 24%),linear-gradient(180deg,#0a1730,#08152a 60%,#071126)!important;color:#fff}.page{min-height:calc(100vh - 76px);padding:28px 30px 34px!important}.page .subtitle{color:#b8c2d9!important}.page h1,.page h2,.page h3{overflow:visible!important;text-overflow:clip!important;white-space:normal!important;max-height:none!important}.material-body h3,.material-body p,.support-equipment-name,.support-doc-copy b,.support-doc-copy small,.dashboard-details-row *{overflow:visible!important;text-overflow:clip!important;white-space:normal!important;-webkit-line-clamp:unset!important;line-clamp:unset!important;max-height:none!important}
+/* Înapoi mereu în stânga. */
+.page-head{justify-content:flex-start!important;align-items:flex-start!important}.page-head>.back-btn,.page-head>.portal-back-btn{order:-10;flex:0 0 auto;margin-right:12px}.viewer-head{justify-content:flex-start!important;gap:16px!important;background:#071126!important;color:#fff!important}.viewer-back-btn{margin:0!important}.viewer-head #viewerTitle{white-space:normal!important;overflow:visible!important}.viewer-body{background:transparent!important}
+/* Gestionare: butonul Adaugă nu mai există aici. */
+#manageMaterialsAddBtn{display:none!important}.manage-material-actions{justify-content:flex-start!important}
+/* Dashboard export + preview */
+.metric-export{position:absolute;right:18px;top:16px;padding:7px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:rgba(15,23,42,.12);color:inherit;font-size:11px;font-weight:900;cursor:pointer}.dashboard-pro-card{position:relative}.admin-preview-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.admin-preview-actions span{font-size:12px;font-weight:800}.admin-preview-actions button{padding:7px 10px;border-radius:999px;border:1px solid #c4b5fd;background:#fff;color:#5b21b6;font-weight:800;cursor:pointer}
+/* Global search */
+.global-search-result{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:18px;text-align:left;padding:18px;border:1px solid rgba(148,163,184,.25);border-radius:16px;background:rgba(255,255,255,.07);color:#fff}.global-search-result b{font-size:17px}.global-search-result p{margin:6px 0;color:#cbd5e1}.global-search-result small{color:#93c5fd}
+/* Logo-urile celor 3 zone au aceeași cutie vizuală și același fade. */
+.support-zone-visual{min-height:270px!important;height:270px!important;padding:24px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:radial-gradient(circle at center,rgba(255,255,255,.07),transparent 68%)!important}.support-zone-visual img,.support-card-intern .support-zone-visual img{display:block!important;width:260px!important;height:180px!important;max-width:82%!important;object-fit:contain!important;object-position:center!important;filter:drop-shadow(0 18px 30px rgba(0,0,0,.22))!important}.support-card-intern .support-zone-visual{background:radial-gradient(circle at center,rgba(139,92,246,.12),transparent 68%)!important}.support-card-intern .support-zone-visual::before{content:""!important;position:absolute!important;inset:12%!important;background:radial-gradient(circle,rgba(139,92,246,.20),transparent 70%)!important;filter:blur(22px)!important;display:block!important}.support-card-intern .support-zone-visual>img{position:relative!important;z-index:2!important;background:transparent!important}
+@media(max-width:760px){.page{padding:18px!important}.brand-row{flex-wrap:wrap}.header-action-btn{font-size:12px}.metric-export{position:static;margin-top:8px}.support-zone-visual{height:210px!important;min-height:210px!important}}
+
+.dashboard-details-search{width:min(520px,70vw);margin-top:10px;padding:10px 13px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;color:#111827}
+.dashboard-detail-row *{overflow:visible!important;text-overflow:clip!important;white-space:normal!important;max-height:none!important}
+/* egalizare finală logo-uri: aceeași cutie și fade */
+.support-zone-card.support-card-carrefour>.support-zone-visual>img,
+.support-zone-card.support-card-franciza>.support-zone-visual>img,
+.support-zone-card.support-card-intern>.support-zone-visual>img{display:block!important;width:260px!important;height:180px!important;max-width:82%!important;object-fit:contain!important;object-position:center!important;position:relative!important;z-index:2!important;background:transparent!important;border:0!important;box-shadow:none!important}
+.support-zone-card.support-card-carrefour>.support-zone-visual,
+.support-zone-card.support-card-franciza>.support-zone-visual,
+.support-zone-card.support-card-intern>.support-zone-visual{min-height:270px!important;height:270px!important;padding:24px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:radial-gradient(circle at center,rgba(255,255,255,.08),transparent 68%)!important}
+.support-zone-card.support-card-intern>.support-zone-visual::before{content:""!important;display:block!important;position:absolute!important;inset:12%!important;background:radial-gradient(circle,rgba(139,92,246,.20),transparent 70%)!important;filter:blur(22px)!important}
+
+
+/* ===== Feedback materiale ===== */
+.viewer-body{overflow:auto!important}.material-feedback{margin:0 20px 24px;padding:18px;border:1px solid rgba(148,163,184,.25);border-radius:16px;background:rgba(255,255,255,.06);color:#fff}.feedback-head{display:flex;justify-content:space-between;gap:18px;align-items:center}.feedback-head>div:first-child{display:flex;flex-direction:column;gap:4px}.feedback-head strong{font-size:18px}.feedback-head span{color:#b8c2d9;font-size:13px}.feedback-reactions{display:flex;gap:8px}.feedback-reaction{padding:9px 12px;border-radius:999px;border:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.45);color:#fff;font-weight:800;cursor:pointer}.feedback-reaction.selected{border-color:#60a5fa;background:rgba(37,99,235,.28);box-shadow:0 0 0 2px rgba(96,165,250,.12)}#feedbackComment{box-sizing:border-box;width:100%;min-height:84px;margin-top:14px;padding:12px 14px;border-radius:12px;border:1px solid rgba(148,163,184,.30);background:rgba(7,17,38,.72);color:#fff;resize:vertical}#feedbackComment::placeholder{color:#94a3b8}.feedback-actions{display:flex;align-items:center;justify-content:flex-end;gap:14px;margin-top:10px}.feedback-actions #feedbackStatus{margin-right:auto;color:#cbd5e1;font-size:13px}.card-feedback .metric-icon{font-size:24px}@media(max-width:760px){.feedback-head{align-items:flex-start;flex-direction:column}.feedback-actions{align-items:stretch;flex-direction:column}.feedback-actions #feedbackStatus{margin-right:0}.feedback-actions button{width:100%}}

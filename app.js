@@ -203,7 +203,8 @@ async function recordSession() {
 
 
 function configureAccountIdentity() {
-setTimeout(applyFinalUserHeaderLayout,0);
+setTimeout(enforceSupportHeader,0);
+setTimeout(syncSupportColleagueLayout,0);
   const badge = el("userRoleBadge");
   const hero = el("accountHero");
   const sidebarSubtitle = el("sidebarSubtitle");
@@ -290,6 +291,7 @@ async function finishLogin() {
   document.querySelectorAll('[data-permission="users"]').forEach(x => x.classList.toggle("hidden", !isPrimaryAdmin()));
   el("adminCategoryChooser").classList.toggle("hidden", currentRole !== "admin");
   configureAccountIdentity();
+  setTimeout(applyFinalIdentityLayout, 20);
   if (currentRole === "suport") {
     renderPortalLandingForRole();
     el("supportBuildMarker")?.classList.remove("hidden");
@@ -1750,37 +1752,360 @@ function enforceFinalSupportHeader(){
   if(n){n.textContent="";n.style.display="none";n.classList.add("hidden");}
 }
 
-
-function applyFinalUserHeaderLayout(){
+/* SMARTID_FINAL_HEADER_AND_DUPLICATE_TITLE_FIX */
+function applyFinalIdentityLayout(){
   if(currentRole === "admin") return;
-  const badge=document.getElementById("userRoleBadge");
-  const userName=document.getElementById("currentUserName");
-  const manageBtn=document.getElementById("supportManageBtn");
-  const brandRow=document.querySelector(".brand-row");
-  const topActions=document.querySelector(".top-actions");
-  const pageHead=document.querySelector("#equipmentPage > .page-head");
 
-  // Pentru Carrefour, Franciza si Suport afisam in dreapta numele contului conectat.
-  if(badge) badge.classList.add("hidden");
+  const badge = document.getElementById("userRoleBadge");
+  const userName = document.getElementById("currentUserName");
+  const manageBtn = document.getElementById("supportManageBtn");
+  const brandRow = document.querySelector(".topbar .brand-row");
+  const pageHead = document.querySelector("#equipmentPage > .page-head");
+
+  // In dreapta afisam numele real al utilizatorului conectat, indiferent de rol.
+  if(badge){
+    badge.textContent = currentDisplayName || currentEmail || "Utilizator";
+    badge.dataset.role = currentRole;
+    badge.classList.remove("hidden");
+  }
   if(userName){
-    userName.textContent=currentDisplayName || currentEmail || "Utilizator";
-    userName.classList.remove("hidden");
-    userName.style.display="inline-flex";
+    userName.textContent = "";
+    userName.classList.add("hidden");
   }
 
-  // Colegii Support care au drept de adaugare/gestionare primesc butonul in stanga.
+  // Pentru colegii Support cu drept de adaugare/gestionare, butonul este in stanga.
   if(manageBtn){
     if(currentRole === "suport" && currentCanAdd){
       if(brandRow && manageBtn.parentElement !== brandRow) brandRow.appendChild(manageBtn);
+      manageBtn.style.display = "inline-flex";
       manageBtn.classList.remove("hidden");
-      manageBtn.style.display="inline-flex";
-    }else{
+    } else {
+      manageBtn.style.display = "none";
       manageBtn.classList.add("hidden");
-      manageBtn.style.display="none";
-      if(topActions && manageBtn.parentElement !== topActions) topActions.insertBefore(manageBtn, document.getElementById("logoutBtn"));
     }
   }
 
-  // La userii simpli Carrefour/Franciza scoatem titlul mare repetat din stanga, deasupra cardului.
-  if(pageHead) pageHead.style.display=(currentRole === "carrefour" || currentRole === "franciza") ? "none" : "";
+  // Carrefour/Franciza: eliminam doar titlul mare repetat din stanga, deasupra cardului.
+  if(pageHead){
+    pageHead.style.display = (currentRole === "carrefour" || currentRole === "franciza") ? "none" : "";
+  }
 }
+
+
+/* ==========================================================
+   SMARTID PROD RC 15.09 — cerinte functionale punctuale
+   ========================================================== */
+let adminPreviewRole = "";
+let smartPageHistory = [];
+let smartLastPage = "";
+
+function visiblePageId(){
+  const page=[...document.querySelectorAll('.page')].find(p=>!p.classList.contains('hidden'));
+  return page?.id || "";
+}
+
+function smartShowPage(id, {push=true}={}){
+  const current=visiblePageId();
+  if(push && current && current!==id) smartPageHistory.push(current);
+  showPage(id);
+  smartLastPage=id;
+  ensureBackButtons();
+}
+
+function smartBack(){
+  const destination=smartPageHistory.pop();
+  if(destination){ showPage(destination); smartLastPage=destination; return; }
+  if(currentRole==='admin'){ showPage('dashboardPage'); loadDashboard(); }
+  else { renderEquipment(); showPage('equipmentPage'); }
+}
+
+function ensureBackButtons(){
+  document.querySelectorAll('.page:not(#dashboardPage):not(#equipmentPage)').forEach(page=>{
+    if(page.id==='manageMaterialsPage') return;
+    const head=page.querySelector(':scope > .page-head');
+    if(!head || head.querySelector('[data-smart-back], .back-btn')) return;
+    const b=document.createElement('button');
+    b.type='button'; b.className='portal-back-btn'; b.dataset.smartBack='1'; b.textContent='← Înapoi';
+    head.prepend(b);
+  });
+  document.querySelectorAll('[data-smart-back]').forEach(b=>{ if(!b.dataset.bound){b.dataset.bound='1';b.onclick=smartBack;} });
+}
+
+function syncProductionHeader(){
+  const manage=document.getElementById('headerManageMaterialsBtn');
+  const add=document.getElementById('headerAddMaterialBtn');
+  const badge=document.getElementById('userRoleBadge');
+  const oldName=document.getElementById('currentUserName');
+  const canUseMaterials = currentRole==='admin' || (currentRole==='suport' && currentCanAdd);
+  if(manage){manage.classList.toggle('hidden',!canUseMaterials);manage.style.display=canUseMaterials?'inline-flex':'none';}
+  if(add){add.classList.toggle('hidden',!canUseMaterials);add.style.display=canUseMaterials?'inline-flex':'none';}
+  if(badge){
+    badge.textContent=currentDisplayName || currentEmail || (currentRole==='admin'?'Admin':'Utilizator');
+    badge.dataset.role=currentRole;
+    badge.classList.remove('hidden');
+    badge.style.display='inline-flex';
+  }
+  if(oldName){oldName.classList.add('hidden');oldName.style.display='none';}
+  // Titlul mare duplicat din stanga dispare pentru userii normali si colegii Support.
+  const pageHead=document.querySelector('#equipmentPage > .page-head');
+  if(pageHead && currentRole!=='admin') pageHead.style.display='none';
+}
+
+function openAddMaterialDirect(){
+  if(!(currentRole==='admin'||currentCanAdd)){alert('Nu ai dreptul de a adăuga materiale.');return;}
+  if(typeof resetMaterialForm==='function') resetMaterialForm();
+  smartShowPage('addMaterialPage');
+}
+
+async function openManageMaterialsDirect(){
+  if(!(currentRole==='admin'||currentCanAdd)){alert('Nu ai acces la gestionarea materialelor.');return;}
+  await renderAdminMaterials(); smartShowPage('manageMaterialsPage');
+}
+
+document.getElementById('headerAddMaterialBtn')?.addEventListener('click',openAddMaterialDirect);
+document.getElementById('headerManageMaterialsBtn')?.addEventListener('click',openManageMaterialsDirect);
+document.getElementById('globalSearchBackBtn')?.addEventListener('click',smartBack);
+
+function globalSearch(term){
+  const q=String(term||'').trim().toLowerCase();
+  if(q.length<2) return;
+  const results=materials.filter(m=>{
+    const cats=(m.categories||[]).map(normCategory);
+    const allowed=currentRole==='admin' || ((m.status||'approved')==='approved' && (currentRole==='suport' || cats.includes(currentCategory)));
+    const hay=[m.title,m.description,m.tags,m.type,m.createdBy,...cats,...(m.equipment||[])].join(' ').toLowerCase();
+    return allowed && hay.includes(q);
+  }).sort((a,b)=>Number(b.views||0)-Number(a.views||0));
+  const box=document.getElementById('globalSearchResults');
+  document.getElementById('globalSearchSubtitle').textContent=`${results.length} rezultate pentru „${term}”`;
+  box.innerHTML=results.length?results.map(m=>`<button type="button" class="global-search-result" data-global-material="${escapeHtml(m.id)}"><div><b>${escapeHtml(m.title||'Material')}</b><p>${escapeHtml(m.description||'')}</p><small>${normType(m.type)==='videoclip'?'Videoclip':'Procedură'} · ${(m.categories||[]).join(', ')}</small></div><span>Deschide ›</span></button>`).join(''):'<div class="empty">Nu am găsit materiale.</div>';
+  box.querySelectorAll('[data-global-material]').forEach(btn=>btn.onclick=()=>{const m=materials.find(x=>String(x.id)===String(btn.dataset.globalMaterial));if(m)openViewer(m);});
+  if(visiblePageId()!=='globalSearchPage') smartShowPage('globalSearchPage');
+}
+
+// Search global în toate conturile; în lista de materiale păstrăm filtrarea contextuală.
+const globalSearchInput=document.getElementById('searchInput');
+if(globalSearchInput){
+  let timer;
+  globalSearchInput.addEventListener('input',()=>{
+    clearTimeout(timer); const q=globalSearchInput.value.trim();
+    if(document.getElementById('materialsPage') && !document.getElementById('materialsPage').classList.contains('hidden')){renderSelectedMaterials();return;}
+    if(!q){ if(visiblePageId()==='globalSearchPage') smartBack(); return; }
+    timer=setTimeout(()=>globalSearch(q),180);
+  });
+}
+
+// Search administrare: titlu + descriere + taguri + tip + categorie + echipament + autor + status.
+const originalRenderAdminMaterials=renderAdminMaterials;
+renderAdminMaterials=async function(){
+  const container=el('adminMaterialsList');
+  const term=(el('manageMaterialSearch')?.value||'').trim().toLowerCase();
+  const type=el('manageMaterialType')?.value||'all';
+  if(!materials.length) await loadMaterials();
+  const snapshot=materials;
+  if(term){
+    materials=snapshot.filter(m=>[m.title,m.description,m.tags,m.type,m.createdBy,m.status,...(m.categories||[]),...(m.equipment||[])].join(' ').toLowerCase().includes(term));
+  }
+  if(type!=='all') materials=materials.filter(m=>normType(m.type)===type);
+  const savedSearch=el('manageMaterialSearch')?.value;
+  const savedType=el('manageMaterialType')?.value;
+  if(el('manageMaterialSearch')) el('manageMaterialSearch').value='';
+  if(el('manageMaterialType')) el('manageMaterialType').value='all';
+  await originalRenderAdminMaterials();
+  materials=snapshot;
+  if(el('manageMaterialSearch')) el('manageMaterialSearch').value=savedSearch||'';
+  if(el('manageMaterialType')) el('manageMaterialType').value=savedType||'all';
+};
+
+function dashboardRows(key){
+  const {sessions=[],views=[],shares=[]}=dashboardDetailCache||{};
+  if(key==='logins') return sessions.map(x=>({Utilizator:displayUser(x.email),Email:x.email||'',Magazin:x.storeName||'',ID_Magazin:x.storeId||'',Data:dashboardTimestamp(x.createdAt)}));
+  if(key==='stores'){
+    const map=new Map(); sessions.forEach(x=>{const k=x.storeId||x.storeName||'Necunoscut';const v=map.get(k)||{Magazin:x.storeName||k,ID:x.storeId||'',Autentificari:0,Ultima:''};v.Autentificari++;v.Ultima=dashboardTimestamp(x.createdAt);map.set(k,v)});return [...map.values()];
+  }
+  if(key==='videos'||key==='procedures') return views.filter(x=>normType(x.type)===(key==='videos'?'videoclip':'procedura')).map(x=>({Titlu:x.title||'',Utilizator:displayUser(x.email),Email:x.email||'',Magazin:x.storeName||'',Data:dashboardTimestamp(x.createdAt)}));
+  if(key==='shares') return shares.map(x=>({Titlu:x.title||'',Utilizator:displayUser(x.email),Metoda:x.method||x.channel||'',Data:dashboardTimestamp(x.createdAt)}));
+  if(key==='pending') return materials.filter(m=>(m.status||'approved')==='pending').map(m=>({Titlu:m.title||'',Tip:normType(m.type),Autor:displayUser(m.createdBy),Categorii:(m.categories||[]).join(', '),Echipamente:(m.equipment||[]).join(', '),Status:m.status||''}));
+  return [];
+}
+function exportDashboardExcel(key){
+  const rows=dashboardRows(key); if(!rows.length){alert('Nu există date de exportat.');return;}
+  if(!window.XLSX){alert('Modulul Excel nu s-a încărcat. Reîncarcă pagina și încearcă din nou.');return;}
+  const ws=XLSX.utils.json_to_sheet(rows); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Date'); XLSX.writeFile(wb,`SmartID_${key}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+document.querySelectorAll('[data-export-dashboard]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();exportDashboardExcel(b.dataset.exportDashboard);}));
+
+function enterAdminPreview(role){
+  if(currentRole!=='admin') return;
+  adminPreviewRole=role;
+  const old=currentRole; currentRole=role;
+  renderPortalLandingForRole(); currentRole=old;
+  document.getElementById('standardTypeGrid')?.classList.add('hidden');
+  document.getElementById('supportPortalLanding')?.classList.remove('hidden');
+  const head=document.querySelector('#equipmentPage > .page-head'); if(head)head.style.display='none';
+  document.getElementById('exitAdminPreviewBtn')?.classList.remove('hidden');
+  smartShowPage('equipmentPage');
+}
+document.querySelectorAll('[data-preview-role]').forEach(b=>b.addEventListener('click',()=>enterAdminPreview(b.dataset.previewRole)));
+document.getElementById('exitAdminPreviewBtn')?.addEventListener('click',()=>{adminPreviewRole='';document.getElementById('exitAdminPreviewBtn')?.classList.add('hidden');showPage('dashboardPage');loadDashboard();});
+
+// În preview Admin filtrăm și categoria, nu doar echipamentul.
+const originalRenderSelectedMaterials=renderSelectedMaterials;
+renderSelectedMaterials=function(){
+  if(!adminPreviewRole) return originalRenderSelectedMaterials();
+  const original=materials; materials=original.filter(m=>(m.categories||[]).map(normCategory).includes(adminPreviewRole));
+  try{return originalRenderSelectedMaterials();}finally{materials=original;}
+};
+
+// Viewer: un singur Înapoi închide viewerul și revine exact la lista din care a fost deschis.
+const prodCloseViewer=()=>{el('viewer').classList.remove('open');el('viewerFrame').src='about:blank';currentOpenMaterial=null;};
+const closeViewerBtn=document.getElementById('closeViewerBtn');
+if(closeViewerBtn){const clone=closeViewerBtn.cloneNode(true);closeViewerBtn.replaceWith(clone);clone.addEventListener('click',prodCloseViewer);}
+
+// Reaplică identitatea după autentificare / restaurare fără a modifica fluxul de login.
+const originalConfigureIdentityProd=configureAccountIdentity;
+configureAccountIdentity=function(){originalConfigureIdentityProd();setTimeout(()=>{syncProductionHeader();ensureBackButtons();},0);};
+setTimeout(()=>{if(currentEmail)syncProductionHeader();ensureBackButtons();},100);
+
+
+/* Search în ferestrele de detalii Dashboard */
+let prodDashboardRows=[];
+const originalOpenDashboardDetailsProd=openDashboardDetails;
+openDashboardDetails=function(title,subtitle,rows){
+  prodDashboardRows=Array.isArray(rows)?rows:[];
+  originalOpenDashboardDetailsProd(title,subtitle,prodDashboardRows);
+  const input=document.getElementById('dashboardDetailsSearch');
+  if(input){input.value='';input.focus();}
+};
+function filterDashboardDetailRows(){
+  const q=(document.getElementById('dashboardDetailsSearch')?.value||'').trim().toLowerCase();
+  const rows=!q?prodDashboardRows:prodDashboardRows.filter(r=>[r.title,r.detail,r.when].join(' ').toLowerCase().includes(q));
+  const body=document.getElementById('dashboardDetailsBody');
+  if(!body)return;
+  body.innerHTML=rows.length?rows.map(row=>`<div class="dashboard-detail-row"><div class="dashboard-detail-main"><b>${escapeHtml(row.title||'—')}</b><span>${escapeHtml(row.detail||'')}</span></div><small>${escapeHtml(row.when||'')}</small></div>`).join(''):'<div class="empty">Nu există rezultate.</div>';
+}
+document.getElementById('dashboardDetailsSearch')?.addEventListener('input',filterDashboardDetailRows);
+
+/* Clase de rol explicite pentru reguli vizuale precise. */
+const originalSyncProductionHeader=syncProductionHeader;
+syncProductionHeader=function(){
+  document.body.classList.remove('role-admin','role-carrefour','role-franciza');
+  document.body.classList.add(`role-${currentRole}`);
+  originalSyncProductionHeader();
+};
+
+
+/* ===== FEEDBACK MATERIALE ===== */
+let currentFeedbackReaction = "";
+function feedbackDocId(materialId,email){
+  return `${String(materialId||"").replaceAll("/","_")}__${String(email||"").toLowerCase().replaceAll("/","_")}`;
+}
+function syncFeedbackButtons(){
+  const up=el("feedbackUpBtn"),down=el("feedbackDownBtn");
+  if(up) up.classList.toggle("selected",currentFeedbackReaction==="up");
+  if(down) down.classList.toggle("selected",currentFeedbackReaction==="down");
+}
+async function loadOwnFeedback(material){
+  currentFeedbackReaction="";
+  if(el("feedbackComment")) el("feedbackComment").value="";
+  if(el("feedbackStatus")) el("feedbackStatus").textContent="";
+  syncFeedbackButtons();
+  if(!material?.id || !currentEmail) return;
+  try{
+    const snap=await getDoc(doc(db,"materialFeedback",feedbackDocId(material.id,currentEmail)));
+    if(snap.exists()){
+      const data=snap.data();
+      currentFeedbackReaction=data.reaction||"";
+      if(el("feedbackComment")) el("feedbackComment").value=data.comment||"";
+      syncFeedbackButtons();
+    }
+  }catch(error){console.warn("Feedback-ul nu a putut fi încărcat.",error);}
+}
+async function saveOwnFeedback(){
+  if(!currentOpenMaterial?.id || !currentEmail) return;
+  const comment=(el("feedbackComment")?.value||"").trim();
+  if(!currentFeedbackReaction && !comment){
+    if(el("feedbackStatus")) el("feedbackStatus").textContent="Alege 👍/👎 sau scrie un comentariu.";
+    return;
+  }
+  const btn=el("submitFeedbackBtn"); if(btn) btn.disabled=true;
+  if(el("feedbackStatus")) el("feedbackStatus").textContent="Se salvează...";
+  try{
+    await setDoc(doc(db,"materialFeedback",feedbackDocId(currentOpenMaterial.id,currentEmail)),{
+      materialId:currentOpenMaterial.id,
+      title:currentOpenMaterial.title||"",
+      type:currentOpenMaterial.type||"",
+      reaction:currentFeedbackReaction,
+      comment,
+      email:currentEmail,
+      displayName:currentDisplayName||"",
+      role:currentRole,
+      storeId:currentStoreId||"",
+      storeName:currentStoreName||"",
+      storeFormat:currentStoreFormat||"",
+      updatedAt:serverTimestamp(),
+      createdAt:serverTimestamp()
+    },{merge:true});
+    if(el("feedbackStatus")) el("feedbackStatus").textContent="Mulțumim! Feedback-ul a fost salvat.";
+  }catch(error){
+    console.error(error);
+    if(el("feedbackStatus")) el("feedbackStatus").textContent="Feedback-ul nu a putut fi salvat.";
+  }finally{if(btn) btn.disabled=false;}
+}
+el("feedbackUpBtn")?.addEventListener("click",()=>{currentFeedbackReaction=currentFeedbackReaction==="up"?"":"up";syncFeedbackButtons();});
+el("feedbackDownBtn")?.addEventListener("click",()=>{currentFeedbackReaction=currentFeedbackReaction==="down"?"":"down";syncFeedbackButtons();});
+el("submitFeedbackBtn")?.addEventListener("click",saveOwnFeedback);
+
+const feedbackOpenViewerBase=openViewer;
+openViewer=async function(material){
+  await feedbackOpenViewerBase(material);
+  loadOwnFeedback(material);
+};
+
+/* Admin: feedback centralizat în Dashboard. */
+const feedbackLoadDashboardBase=loadDashboard;
+loadDashboard=async function(){
+  await feedbackLoadDashboardBase();
+  if(currentRole!=="admin") return;
+  try{
+    const snap=await getDocs(collection(db,"materialFeedback"));
+    const feedback=snap.docs.map(d=>({id:d.id,...d.data()}));
+    dashboardDetailCache.feedback=feedback;
+    if(el("statFeedback")) el("statFeedback").textContent=feedback.length;
+  }catch(error){
+    console.warn("Feedback-ul nu a putut fi încărcat în Dashboard.",error);
+    dashboardDetailCache.feedback=[];
+    if(el("statFeedback")) el("statFeedback").textContent="0";
+  }
+};
+
+const feedbackSetupDashboardBase=setupDashboardInteractions;
+setupDashboardInteractions=function(){
+  feedbackSetupDashboardBase();
+  const button=document.querySelector('[data-stat-details="feedback"]');
+  if(button) button.onclick=(event)=>{
+    event.preventDefault();event.stopPropagation();
+    const feedback=dashboardDetailCache.feedback||[];
+    openDashboardDetails("Feedback utilizatori","Reacțiile și comentariile trimise pentru materiale.",
+      [...feedback].sort((a,b)=>(b.updatedAt?.seconds||b.createdAt?.seconds||0)-(a.updatedAt?.seconds||a.createdAt?.seconds||0)).map(x=>({
+        title:x.title||"Material",
+        detail:`${x.reaction==="up"?"👍 Util":x.reaction==="down"?"👎 Nu a fost util":"Fără reacție"} · ${displayUser(x.email)}${x.storeName?` · ${x.storeName}`:""}${x.comment?` · ${x.comment}`:""}`,
+        when:dashboardTimestamp(x.updatedAt||x.createdAt)
+      }))
+    );
+  };
+};
+
+const feedbackDashboardRowsBase=dashboardRows;
+dashboardRows=function(key){
+  if(key!=="feedback") return feedbackDashboardRowsBase(key);
+  return (dashboardDetailCache.feedback||[]).map(x=>({
+    Material:x.title||"",
+    Reactie:x.reaction==="up"?"Util":x.reaction==="down"?"Nu a fost util":"",
+    Comentariu:x.comment||"",
+    Utilizator:displayUser(x.email),
+    Email:x.email||"",
+    Magazin:x.storeName||"",
+    ID_Magazin:x.storeId||"",
+    Data:dashboardTimestamp(x.updatedAt||x.createdAt)
+  }));
+};
