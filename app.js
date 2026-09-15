@@ -202,6 +202,15 @@ async function recordSession() {
 }
 
 
+function storeIdentityLabel(){
+  const name=String(currentStoreName||"").trim();
+  if(!name) return currentDisplayName || currentEmail || "Utilizator";
+  const lower=name.toLowerCase();
+  if(currentRole==="franciza") return lower.includes("franciz") ? name : `Franciză ${name}`;
+  if(currentRole==="carrefour") return lower.includes("carrefour") ? name : `Carrefour ${name}`;
+  return name;
+}
+
 function configureAccountIdentity() {
 setTimeout(enforceSupportHeader,0);
 setTimeout(syncSupportColleagueLayout,0);
@@ -1764,7 +1773,7 @@ function applyFinalIdentityLayout(){
 
   // In dreapta afisam numele real al utilizatorului conectat, indiferent de rol.
   if(badge){
-    badge.textContent = currentDisplayName || currentEmail || "Utilizator";
+    badge.textContent = (currentRole === "carrefour" || currentRole === "franciza") ? storeIdentityLabel() : (currentDisplayName || currentEmail || "Utilizator");
     badge.dataset.role = currentRole;
     badge.classList.remove("hidden");
   }
@@ -1840,7 +1849,7 @@ function syncProductionHeader(){
   if(manage){manage.classList.toggle('hidden',!canUseMaterials);manage.style.display=canUseMaterials?'inline-flex':'none';}
   if(add){add.classList.toggle('hidden',!canUseMaterials);add.style.display=canUseMaterials?'inline-flex':'none';}
   if(badge){
-    badge.textContent = currentRole==='admin' ? 'ADMIN' : ((currentRole==='carrefour'||currentRole==='franciza') && currentStoreName ? currentStoreName : (currentDisplayName || currentEmail || 'Utilizator'));
+    badge.textContent = currentRole==='admin' ? 'ADMIN' : ((currentRole==='carrefour'||currentRole==='franciza') ? storeIdentityLabel() : (currentDisplayName || currentEmail || 'Utilizator'));
     badge.dataset.role=currentRole;
     badge.classList.remove('hidden');
     badge.style.display='inline-flex';
@@ -2125,7 +2134,7 @@ document.getElementById('previewAllUsersBtn')?.addEventListener('click',()=>ente
 function applyRequestedIdentity(){
   const badge=document.getElementById('userRoleBadge');
   if(!badge) return;
-  badge.textContent = currentRole==='admin' ? 'ADMIN' : ((currentRole==='carrefour'||currentRole==='franciza') && currentStoreName ? currentStoreName : (currentDisplayName || currentEmail || 'Utilizator'));
+  badge.textContent = currentRole==='admin' ? 'ADMIN' : ((currentRole==='carrefour'||currentRole==='franciza') ? storeIdentityLabel() : (currentDisplayName || currentEmail || 'Utilizator'));
   badge.dataset.role=currentRole;
   badge.classList.remove('hidden'); badge.style.display='inline-flex';
   const canMaterial = currentRole==='admin' || (currentRole==='suport' && currentCanAdd);
@@ -2214,7 +2223,7 @@ function applyFinalPortalChrome(){
   // User normal: numele magazinului selectat, nu emailul contului.
   if(badge){
     if(currentRole==='admin') badge.textContent='ADMIN';
-    else if((currentRole==='carrefour'||currentRole==='franciza') && currentStoreName) badge.textContent=currentStoreName;
+    else if(currentRole==='carrefour'||currentRole==='franciza') badge.textContent=storeIdentityLabel();
     else badge.textContent=currentDisplayName || currentEmail || 'Utilizator';
     badge.classList.remove('hidden'); badge.style.display='inline-flex';
   }
@@ -2239,3 +2248,41 @@ function applyFinalPortalChrome(){
 const _finalConfigureAccountIdentity=configureAccountIdentity;
 configureAccountIdentity=function(){ _finalConfigureAccountIdentity(); setTimeout(applyFinalPortalChrome,50); };
 setTimeout(applyFinalPortalChrome,120);
+
+/* ===== HOTFIX ADMIN HEADER CLEAN =====
+   Gestionare/Adaugare exista exclusiv in sidebar pentru Admin si colegii autorizati.
+*/
+function enforceCleanTopbarFinal(){
+  const topbar=document.querySelector('.topbar');
+  if(!topbar) return;
+  topbar.querySelectorAll('button,a').forEach(node=>{
+    const label=(node.textContent||'').replace(/\s+/g,' ').trim().toLowerCase();
+    if(label.includes('gestionare material') || label.includes('adăug') || label.includes('adaug')){
+      node.style.setProperty('display','none','important');
+      node.classList.add('hidden');
+    }
+  });
+}
+enforceCleanTopbarFinal();
+new MutationObserver(enforceCleanTopbarFinal).observe(document.querySelector('.topbar')||document.body,{childList:true,subtree:true});
+
+/* FIX FINAL — Admin preview = o singura vizualizare, fara selector Carrefour/Franciza/Support */
+(function(){
+  const previewBtn=document.getElementById('previewAllUsersBtn');
+  if(previewBtn){
+    const clean=previewBtn.cloneNode(true);
+    previewBtn.replaceWith(clean);
+    clean.addEventListener('click',()=>{
+      document.body.classList.add('admin-user-preview');
+      enterAdminPreview('suport');
+      document.getElementById('adminCategoryChooser')?.classList.add('hidden');
+      document.getElementById('accountHero')?.classList.add('hidden');
+      const head=document.querySelector('#equipmentPage > .page-head');
+      if(head) head.style.setProperty('display','none','important');
+    });
+  }
+  const exit=document.getElementById('exitAdminPreviewBtn');
+  if(exit){
+    exit.addEventListener('click',()=>document.body.classList.remove('admin-user-preview'));
+  }
+})();

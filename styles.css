@@ -2400,3 +2400,17 @@ input,textarea,select{color:#fff!important}
 #manageMaterialsPage #exportManageMaterialsBtn,.manage-export-row{display:none!important}
 
 @media(max-width:900px){body.persistent-portal-sidebar .content{margin-left:0!important;width:100%!important}.sidebar.persistent{position:fixed!important;transform:translateX(-105%)!important}}
+
+/* HOTFIX FINAL: niciun buton Gestionare/Adaugare in topbar; actiunile raman in sidebar */
+.topbar #headerManageMaterialsBtn,
+.topbar #headerAddMaterialBtn,
+.topbar #supportManageBtn { display:none !important; }
+
+/* FIX 15.09 — Preview Admin curat: un singur user, fara blocul vechi din stanga sus */
+body.admin-user-preview #equipmentPage > .page-head,
+body.admin-user-preview #adminCategoryChooser,
+body.admin-user-preview #accountHero,
+body.admin-user-preview #carrefourBrand,
+body.admin-user-preview #storeWelcome { display:none !important; }
+body.admin-user-preview #equipmentPage { padding-top:18px !important; }
+body.admin-user-preview #exitAdminPreviewBtn { margin:0 0 16px 0 !important; }
