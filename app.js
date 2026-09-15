@@ -1840,7 +1840,7 @@ function syncProductionHeader(){
   if(manage){manage.classList.toggle('hidden',!canUseMaterials);manage.style.display=canUseMaterials?'inline-flex':'none';}
   if(add){add.classList.toggle('hidden',!canUseMaterials);add.style.display=canUseMaterials?'inline-flex':'none';}
   if(badge){
-    badge.textContent=currentDisplayName || currentEmail || (currentRole==='admin'?'Admin':'Utilizator');
+    badge.textContent = currentRole==='admin' ? 'ADMIN' : ((currentRole==='carrefour'||currentRole==='franciza') && currentStoreName ? currentStoreName : (currentDisplayName || currentEmail || 'Utilizator'));
     badge.dataset.role=currentRole;
     badge.classList.remove('hidden');
     badge.style.display='inline-flex';
@@ -2125,7 +2125,7 @@ document.getElementById('previewAllUsersBtn')?.addEventListener('click',()=>ente
 function applyRequestedIdentity(){
   const badge=document.getElementById('userRoleBadge');
   if(!badge) return;
-  badge.textContent = currentRole==='admin' ? 'ADMIN' : (currentDisplayName || currentEmail || 'Utilizator');
+  badge.textContent = currentRole==='admin' ? 'ADMIN' : ((currentRole==='carrefour'||currentRole==='franciza') && currentStoreName ? currentStoreName : (currentDisplayName || currentEmail || 'Utilizator'));
   badge.dataset.role=currentRole;
   badge.classList.remove('hidden'); badge.style.display='inline-flex';
   const canMaterial = currentRole==='admin' || (currentRole==='suport' && currentCanAdd);
@@ -2194,3 +2194,48 @@ dashboardRows=function(key){ if(key==='team') return teamRows(); return rcDashbo
 // Reaplica identitatea dupa login complet.
 const rcFinishLogin=finishLogin;
 finishLogin=async function(){ const r=await rcFinishLogin(); setTimeout(applyRequestedIdentity,50); return r; };
+
+
+/* ===== FINAL FIX 15.09 — SIDEBAR + STORE NAME + LOGO BALANCE ===== */
+function applyFinalPortalChrome(){
+  document.body.classList.remove('persistent-portal-sidebar');
+  const sidebar=document.getElementById('sidebar');
+  const menu=document.getElementById('menuBtn');
+  const badge=document.getElementById('userRoleBadge');
+  const colleagueSidebar = currentRole==='suport' && currentCanAdd;
+  const persistent = currentRole==='admin' || colleagueSidebar;
+  if(sidebar){
+    sidebar.classList.toggle('persistent',persistent);
+    sidebar.classList.toggle('open',persistent);
+  }
+  document.body.classList.toggle('persistent-portal-sidebar',persistent);
+  if(menu) menu.style.display='none';
+
+  // User normal: numele magazinului selectat, nu emailul contului.
+  if(badge){
+    if(currentRole==='admin') badge.textContent='ADMIN';
+    else if((currentRole==='carrefour'||currentRole==='franciza') && currentStoreName) badge.textContent=currentStoreName;
+    else badge.textContent=currentDisplayName || currentEmail || 'Utilizator';
+    badge.classList.remove('hidden'); badge.style.display='inline-flex';
+  }
+
+  // Headerul ramane curat; Gestionare/Adaugare sunt exclusiv in sidebar.
+  ['headerManageMaterialsBtn','headerAddMaterialBtn','supportManageBtn'].forEach(id=>{
+    const b=document.getElementById(id); if(b){b.classList.add('hidden');b.style.display='none';}
+  });
+
+  // Sidebar: admin are meniul complet; colegii vad strict actiunile permise.
+  document.querySelectorAll('#sidebar .side-btn').forEach(btn=>{
+    const page=btn.dataset.page;
+    let visible=false;
+    if(currentRole==='admin') visible=true;
+    else if(colleagueSidebar){
+      if(page==='addMaterialPage') visible=!!currentCanAdd;
+      if(page==='manageMaterialsPage') visible=!!currentCanAdd;
+    }
+    btn.classList.toggle('hidden',!visible);
+  });
+}
+const _finalConfigureAccountIdentity=configureAccountIdentity;
+configureAccountIdentity=function(){ _finalConfigureAccountIdentity(); setTimeout(applyFinalPortalChrome,50); };
+setTimeout(applyFinalPortalChrome,120);

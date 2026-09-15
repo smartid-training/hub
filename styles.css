@@ -2364,3 +2364,39 @@ body.role-carrefour #equipmentPage>.page-head,body.role-franciza #equipmentPage>
   mask-image:radial-gradient(ellipse 72% 72% at 50% 50%,#000 48%,rgba(0,0,0,.92) 62%,transparent 100%) !important;
 }
 .support-zone-card.support-card-intern > .support-zone-visual > .support-zone-glow{display:block !important;background:#8b5cf6 !important;opacity:.16 !important}
+
+/* ===== FINAL VISUAL FIX — sidebar icon + alb + logo-uri uniforme ===== */
+/* Header: fara Gestionare/Adaugare; actiunile sunt in stanga. */
+#headerManageMaterialsBtn,#headerAddMaterialBtn,#supportManageBtn{display:none!important}
+
+/* Sidebar persistent numai pentru Admin si colegii cu drepturi. */
+.sidebar.persistent{transform:translateX(0)!important;width:245px!important;padding:24px 16px!important;box-shadow:none!important;border-right:1px solid #172b4d!important;background:linear-gradient(180deg,#071126,#09172d)!important}
+.sidebar.persistent .close-menu,.sidebar.persistent h2,.sidebar.persistent .sidebar-subtitle{display:none!important}
+body.persistent-portal-sidebar .content{margin-left:245px!important;width:calc(100% - 245px)!important}
+body.persistent-portal-sidebar .topbar{padding-left:18px!important}
+.sidebar.persistent .side-btn{display:flex;align-items:center;gap:12px!important;min-height:48px;padding:12px 14px!important;margin:5px 0!important;border-radius:12px!important;color:#fff!important;font-weight:700!important;font-size:14px!important}
+.sidebar.persistent .side-btn:hover{background:rgba(124,58,237,.25)!important}
+.sidebar.persistent .side-btn[data-page="dashboardPage"]{background:linear-gradient(90deg,rgba(124,58,237,.42),rgba(88,28,135,.28))!important}
+.sidebar.persistent .side-btn[data-page="manageMaterialsPage"]{margin-top:22px!important;border-top:1px solid #30415f!important;border-radius:0 0 12px 12px!important;padding-top:20px!important}
+
+/* Text alb in portal; pastram doar accentele/statusurile colorate. */
+.page,.page p,.page span,.page small,.page label,.page h1,.page h2,.page h3,.panel,.panel p,.panel span,.panel small,.panel label,.panel h1,.panel h2,.panel h3,.support-zone-content,.support-zone-content *{color:#fff!important}
+.status-chip i,.metric-copy>strong,.metric-icon,.support-type-icon{color:inherit!important}
+input,textarea,select{color:#fff!important}
+
+/* Cele trei zone de logo au aceeasi geometrie si acelasi fade. */
+.support-zone-card>.support-zone-visual{height:250px!important;min-height:250px!important;padding:24px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:radial-gradient(ellipse at center,rgba(80,120,210,.12) 0%,rgba(8,20,42,.05) 50%,transparent 78%)!important}
+.support-zone-card.support-card-franciza>.support-zone-visual{background:radial-gradient(ellipse at center,rgba(34,197,94,.15) 0%,rgba(5,48,31,.10) 50%,transparent 78%)!important}
+.support-zone-card.support-card-intern>.support-zone-visual{background:radial-gradient(ellipse at center,rgba(139,92,246,.18) 0%,rgba(43,20,73,.10) 50%,transparent 78%)!important}
+.support-zone-card>.support-zone-visual>img{width:225px!important;height:155px!important;max-width:72%!important;max-height:68%!important;object-fit:contain!important;object-position:center!important}
+/* Carrefour putin mai mic, cum a fost cerut. */
+.support-zone-card.support-card-carrefour>.support-zone-visual>img{width:195px!important;height:138px!important;max-width:66%!important;max-height:62%!important}
+.support-zone-card.support-card-franciza>.support-zone-visual>img{width:215px!important;height:150px!important;max-width:70%!important;max-height:66%!important}
+.support-zone-card.support-card-intern>.support-zone-visual>img{width:215px!important;height:150px!important;max-width:70%!important;max-height:66%!important;-webkit-mask-image:radial-gradient(ellipse 78% 78% at 50% 50%,#000 52%,rgba(0,0,0,.88) 68%,transparent 100%)!important;mask-image:radial-gradient(ellipse 78% 78% at 50% 50%,#000 52%,rgba(0,0,0,.88) 68%,transparent 100%)!important}
+.support-zone-card>.support-zone-visual:after{content:"";position:absolute;left:18%;right:18%;bottom:26px;height:5px;border-radius:50%;background:currentColor;filter:blur(10px);opacity:.18}
+.support-card-carrefour>.support-zone-visual{color:#3b82f6}.support-card-franciza>.support-zone-visual{color:#22c55e}.support-card-intern>.support-zone-visual{color:#a855f7}
+
+/* Gestionare: fara Export Excel. */
+#manageMaterialsPage #exportManageMaterialsBtn,.manage-export-row{display:none!important}
+
+@media(max-width:900px){body.persistent-portal-sidebar .content{margin-left:0!important;width:100%!important}.sidebar.persistent{position:fixed!important;transform:translateX(-105%)!important}}
