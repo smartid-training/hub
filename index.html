@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=FEEDBACK-1509">
+  <link rel="stylesheet" href="styles.css?v=V17-DARK-LOGO-1509">
 </head>
 <body>
   <main id="loginPage" class="login-page">
@@ -79,10 +79,7 @@
           <div class="dashboard-pro-badges">
             <span class="status-chip"><i></i> Portal activ</span>
             <div class="admin-preview-actions">
-              <span>Vezi pagina ca user:</span>
-              <button type="button" data-preview-role="carrefour">Carrefour</button>
-              <button type="button" data-preview-role="franciza">Franciză</button>
-              <button type="button" data-preview-role="suport">Suport</button>
+              <button type="button" id="previewAllUsersBtn">Vezi pagina ca user</button>
             </div>
           </div>
         </div>
@@ -158,11 +155,11 @@
             <div class="metric-icon">✓</div>
             <div class="metric-copy">
               <strong id="statPending">0</strong>
-              <h3>De aprobat</h3>
+              <h3>Aprobări</h3>
               <p>Materiale încărcate de colegi care așteaptă aprobarea Adminului principal.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <button class="metric-details" data-stat-details="pending">Deschide de aprobat ›</button><button class="metric-export" data-export-dashboard="pending" type="button">Export Excel</button>
+            <button class="metric-details" data-stat-details="pending">Vezi aprobările ›</button><button class="metric-export" data-export-dashboard="pending" type="button">Export Excel</button>
           </article>
         </div>
 
@@ -170,7 +167,8 @@
           <div class="panel-head">
             <div>
               <h2>Activitate echipă</h2>
-              <p class="subtitle">Materialele încărcate de fiecare coleg.</p>
+              <p class="subtitle">Top colegi după numărul de materiale încărcate.</p>
+              <button class="team-export-btn" id="exportTeamBtn" type="button">Export Excel</button>
             </div>
           </div>
 
@@ -299,7 +297,7 @@
             <p class="subtitle">Gestionează materialele și aprobă publicarea celor încărcate de echipă.</p>
           </div>
         </div>
-        <section class="panel"><div class="store-toolbar"><input id="manageMaterialSearch" placeholder="Caută material..."><select id="manageMaterialType"><option value="all">Toate</option><option value="videoclip">Videoclipuri</option><option value="procedura">Proceduri</option></select></div><div id="adminMaterialsList"></div></section>
+        <section class="panel"><div class="manage-export-row"><button id="exportManageMaterialsBtn" class="team-export-btn" type="button">Export Excel</button></div><div class="store-toolbar"><input id="manageMaterialSearch" placeholder="Caută material..."><select id="manageMaterialType"><option value="all">Toate</option><option value="videoclip">Videoclipuri</option><option value="procedura">Proceduri</option></select></div><div id="adminMaterialsList"></div></section>
       </section>
 
       <section id="usersPage" class="page hidden">
@@ -433,7 +431,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script type="module" src="app.js?v=FEEDBACK-1509"></script>
+  <script type="module" src="app.js?v=V17-DARK-LOGO-1509"></script>
 
   <div id="dashboardDetailsModal" class="modal">
     <section class="modal-card dashboard-details-modal">

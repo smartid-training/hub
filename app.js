@@ -478,7 +478,7 @@ function renderPortalLandingForRole() {
     {
       category: "suport",
       title: "PROCEDURI INTERNE",
-      logo: "smartid-logo-visual.jfif",
+      logo: "smartid-logo-visual-fade.png",
       visualClass: "support-card-intern"
     }
   ];
@@ -2109,3 +2109,88 @@ dashboardRows=function(key){
     Data:dashboardTimestamp(x.updatedAt||x.createdAt)
   }));
 };
+
+
+/* ===== SMARTID RC FINAL 15.09 — corectii cerute ===== */
+function smartHome(){
+  smartPageHistory=[];
+  if(currentRole==='admin'){ showPage('dashboardPage'); loadDashboard(); return; }
+  renderEquipment(); showPage('equipmentPage');
+}
+
+// Admin: un singur preview care arata Carrefour + Franciza + Proceduri interne.
+document.getElementById('previewAllUsersBtn')?.addEventListener('click',()=>enterAdminPreview('suport'));
+
+// Identitate: Admin = ADMIN; ceilalti = displayName (fallback email doar daca profilul nu are nume).
+function applyRequestedIdentity(){
+  const badge=document.getElementById('userRoleBadge');
+  if(!badge) return;
+  badge.textContent = currentRole==='admin' ? 'ADMIN' : (currentDisplayName || currentEmail || 'Utilizator');
+  badge.dataset.role=currentRole;
+  badge.classList.remove('hidden'); badge.style.display='inline-flex';
+  const canMaterial = currentRole==='admin' || (currentRole==='suport' && currentCanAdd);
+  ['headerManageMaterialsBtn','headerAddMaterialBtn'].forEach(id=>{
+    const b=document.getElementById(id); if(!b)return;
+    b.classList.toggle('hidden',!canMaterial); b.style.display=canMaterial?'inline-flex':'none';
+  });
+}
+const rcConfigure=configureAccountIdentity;
+configureAccountIdentity=function(){ rcConfigure(); setTimeout(applyRequestedIdentity,30); };
+setTimeout(applyRequestedIdentity,80);
+
+// Pentru useri nu permitem pagina intermediara goala "Categorii echipamente".
+const rcShowPage=showPage;
+showPage=function(id){
+  if(id==='materialTypePage' && currentRole!=='admin' && !adminPreviewRole){
+    renderEquipment(); return rcShowPage('equipmentPage');
+  }
+  return rcShowPage(id);
+};
+
+// Material inexistent: mesaj, apoi direct acasa, fara doua niveluri de back.
+const rcRenderSelected=renderSelectedMaterials;
+renderSelectedMaterials=function(){
+  const result=rcRenderSelected();
+  if(currentRole!=='admin' && !adminPreviewRole){
+    const grid=document.getElementById('materialsGrid');
+    if(grid && grid.querySelector('.empty')){
+      const type=selectedMaterialType==='videoclip'?'videoclip':'procedură';
+      setTimeout(()=>{ alert(`Nu există ${type} disponibil(ă) pentru această selecție.`); smartHome(); },0);
+    }
+  }
+  return result;
+};
+
+// Export activitate echipa.
+function teamRows(){
+  const rows=[];
+  document.querySelectorAll('#contributorsList .team-member-row').forEach((row,i)=>{
+    const name=row.querySelector('.team-member-name b')?.textContent?.trim()||'';
+    const pills=[...row.querySelectorAll('.metric-pill')].map(x=>x.textContent.trim());
+    const total=Number((row.querySelector('.team-member-name small')?.textContent||'').match(/\d+/)?.[0]||0);
+    rows.push({Loc:i+1,Coleg:name,Total_materiale:total,Videoclipuri:pills.find(x=>x.includes('videoclip'))?.match(/\d+/)?.[0]||0,Proceduri:pills.find(x=>x.includes('procedur'))?.match(/\d+/)?.[0]||0});
+  });
+  return rows;
+}
+function writeExcel(rows,name){
+  if(!rows.length){alert('Nu există date de exportat.');return;}
+  if(!window.XLSX){alert('Modulul Excel nu s-a încărcat.');return;}
+  const ws=XLSX.utils.json_to_sheet(rows), wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Date'); XLSX.writeFile(wb,`${name}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+document.getElementById('exportTeamBtn')?.addEventListener('click',()=>writeExcel(teamRows(),'SmartID_Activitate_Echipa'));
+
+// Export din Gestionare materiale, disponibil acelora care au acces la pagina.
+document.getElementById('exportManageMaterialsBtn')?.addEventListener('click',()=>{
+  const rows=materials.filter(m=>currentRole==='admin' || (currentRole==='suport' && (m.createdBy===currentEmail || currentCanManage))).map(m=>({
+    Titlu:m.title||'',Tip:normType(m.type)==='videoclip'?'Videoclip':'Procedură',Descriere:m.description||'',Taguri:m.tags||'',Categorii:(m.categories||[]).join(', '),Echipamente:(m.equipment||[]).join(', '),Status:m.status||'approved',Autor:displayUser(m.createdBy),Vizualizari:Number(m.views||0)
+  }));
+  writeExcel(rows,'SmartID_Materiale');
+});
+
+// Include Activitate echipa in mecanismul de export Dashboard daca este folosit programatic.
+const rcDashboardRows=dashboardRows;
+dashboardRows=function(key){ if(key==='team') return teamRows(); return rcDashboardRows(key); };
+
+// Reaplica identitatea dupa login complet.
+const rcFinishLogin=finishLogin;
+finishLogin=async function(){ const r=await rcFinishLogin(); setTimeout(applyRequestedIdentity,50); return r; };

@@ -2235,3 +2235,132 @@ body.role-carrefour #equipmentPage>.page-head,body.role-franciza #equipmentPage>
 
 /* ===== Feedback materiale ===== */
 .viewer-body{overflow:auto!important}.material-feedback{margin:0 20px 24px;padding:18px;border:1px solid rgba(148,163,184,.25);border-radius:16px;background:rgba(255,255,255,.06);color:#fff}.feedback-head{display:flex;justify-content:space-between;gap:18px;align-items:center}.feedback-head>div:first-child{display:flex;flex-direction:column;gap:4px}.feedback-head strong{font-size:18px}.feedback-head span{color:#b8c2d9;font-size:13px}.feedback-reactions{display:flex;gap:8px}.feedback-reaction{padding:9px 12px;border-radius:999px;border:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.45);color:#fff;font-weight:800;cursor:pointer}.feedback-reaction.selected{border-color:#60a5fa;background:rgba(37,99,235,.28);box-shadow:0 0 0 2px rgba(96,165,250,.12)}#feedbackComment{box-sizing:border-box;width:100%;min-height:84px;margin-top:14px;padding:12px 14px;border-radius:12px;border:1px solid rgba(148,163,184,.30);background:rgba(7,17,38,.72);color:#fff;resize:vertical}#feedbackComment::placeholder{color:#94a3b8}.feedback-actions{display:flex;align-items:center;justify-content:flex-end;gap:14px;margin-top:10px}.feedback-actions #feedbackStatus{margin-right:auto;color:#cbd5e1;font-size:13px}.card-feedback .metric-icon{font-size:24px}@media(max-width:760px){.feedback-head{align-items:flex-start;flex-direction:column}.feedback-actions{align-items:stretch;flex-direction:column}.feedback-actions #feedbackStatus{margin-right:0}.feedback-actions button{width:100%}}
+
+
+/* ===== SMARTID RC FINAL DARK / LIZIBIL ===== */
+html,body,#app,.content{background:#071126!important;color:#f8fafc!important}
+.content{background:radial-gradient(circle at 12% 0%,rgba(37,99,235,.12),transparent 28%),radial-gradient(circle at 88% 8%,rgba(139,92,246,.10),transparent 26%),linear-gradient(180deg,#0a1730,#071126)!important}
+.page,.viewer{background:transparent!important;color:#f8fafc!important}
+.panel,.modal-card,.dashboard-details-dialog,.support-docs-dialog{background:#0d1b34!important;border-color:#243b63!important;color:#f8fafc!important;box-shadow:0 16px 40px rgba(0,0,0,.22)!important}
+.panel h1,.panel h2,.panel h3,.panel label,.panel b,.panel strong,.page label,.page h1,.page h2,.page h3{color:#f8fafc!important}
+.subtitle,.panel p,.panel small,.page small{color:#b8c5dc!important}
+input,textarea,select,.dashboard-details-search,#manageMaterialSearch,#manageMaterialType,#storeSearch,#storeFilter,#geoAdminSearch{background:#08162c!important;color:#f8fafc!important;border:1px solid #31476c!important}
+input::placeholder,textarea::placeholder{color:#8fa2c1!important;opacity:1!important}
+.form-grid label,.equipment-choice-grid label,.category-checks label,.equipment-checks label,#carrefourEquipmentChoices label,#francizaEquipmentChoices label,#suportEquipmentChoices label{background:#12213c!important;color:#f8fafc!important;border-color:#2c4165!important}
+input[type=checkbox]{accent-color:#8b5cf6!important}
+.status,.error{color:#dbeafe!important}
+
+/* Dashboard dark, compact si lizibil. */
+.dashboard-pro-header h1,.dashboard-pro-header p{color:#f8fafc!important}.dashboard-pro-header p{color:#9fb0cc!important}
+.status-chip{background:#0f203c!important;border-color:#2a4268!important;color:#dbeafe!important}
+.dashboard-pro-list{gap:14px!important}
+.dashboard-pro-card{position:relative!important;grid-template-columns:72px minmax(250px,360px) minmax(160px,1fr) 180px!important;min-height:128px!important;padding:18px 22px!important;padding-right:22px!important;background:linear-gradient(135deg,#0e1d37,#101f39)!important;border:1px solid #263d63!important;box-shadow:0 10px 28px rgba(0,0,0,.16)!important;color:#fff!important}
+.metric-copy h3{color:#fff!important;font-size:16px!important}.metric-copy p{color:#aebbd2!important}.metric-line{opacity:.65!important}
+.metric-details{align-self:end!important;justify-self:end!important;margin-top:26px!important;background:#0b1930!important;color:#e8eefb!important;border-color:#38527d!important}
+.metric-export{top:14px!important;right:18px!important;background:#172844!important;color:#dce8ff!important;border:1px solid #3a5279!important;z-index:2!important}
+.card-feedback .metric-icon{background:#1e2745!important}.card-pending .metric-icon{background:#3a1730!important}
+.dashboard-team-pro{background:#0d1b34!important}.team-summary-card,.team-member-row{background:#101f39!important;border-color:#2a4167!important;color:#fff!important}.team-member-row small{color:#aebbd2!important}
+.panel-head{align-items:flex-start!important}.team-export-btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border-radius:10px;border:1px solid #45618d;background:#142846;color:#fff;font-weight:800;cursor:pointer;margin-top:10px}.manage-export-row{display:flex;justify-content:flex-end;margin-bottom:10px}
+
+/* Preview Admin = un singur buton. */
+.admin-preview-actions{display:flex!important}.admin-preview-actions button{background:#142846!important;color:#fff!important;border-color:#6d5bd0!important;padding:9px 14px!important}
+
+/* Back mereu in stanga. */
+.page-head{display:flex!important;justify-content:flex-start!important;align-items:flex-start!important;gap:14px!important}.page-head>.back-btn,.page-head>.portal-back-btn{order:-99!important;margin:0!important}.back-btn,.portal-back-btn{white-space:nowrap!important}
+body.role-carrefour #equipmentPage>.page-head,body.role-franciza #equipmentPage>.page-head,body.role-suport #equipmentPage>.page-head{display:none!important}
+
+/* Logo-uri: aceeasi cutie vizuala; SmartID cu margini estompate. */
+.support-zone-card>.support-zone-visual{position:relative!important;min-height:270px!important;height:270px!important;padding:28px!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+.support-zone-card>.support-zone-visual>img{width:270px!important;height:190px!important;max-width:80%!important;max-height:76%!important;object-fit:contain!important;object-position:center!important;filter:drop-shadow(0 18px 28px rgba(0,0,0,.28))!important}
+.support-card-intern>.support-zone-visual>img{width:270px!important;height:190px!important;object-fit:contain!important;filter:drop-shadow(0 18px 28px rgba(0,0,0,.22))!important}
+.support-card-intern>.support-zone-visual{background:radial-gradient(circle at center,rgba(139,92,246,.20),rgba(57,27,92,.10) 45%,transparent 72%)!important}
+
+/* Viewer + feedback dark. */
+.viewer-head,.viewer-body{background:#071126!important;color:#fff!important}.viewer iframe{background:#0a1730!important}.material-feedback{background:#0d1b34!important;border-color:#2a4167!important}
+
+/* Toate textele/titlurile integral vizibile. */
+.page h1,.page h2,.page h3,.panel h1,.panel h2,.panel h3,.material-body h3,.material-body p,.support-equipment-name,.support-doc-copy b,.support-doc-copy small,.dashboard-detail-row *{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-height:none!important;-webkit-line-clamp:unset!important;line-clamp:unset!important}
+
+@media(max-width:1100px){.dashboard-pro-card{grid-template-columns:64px 1fr 160px!important}.metric-line{display:none!important}}
+@media(max-width:760px){.dashboard-pro-card{display:grid!important;grid-template-columns:58px 1fr!important}.metric-details{grid-column:1/-1!important;justify-self:stretch!important}.metric-export{position:static!important;grid-column:1/-1!important;margin-top:8px!important}.support-zone-card>.support-zone-visual{height:220px!important;min-height:220px!important}}
+
+/* ===== HOTFIX V17 — DARK REAL + LOGO-URI EGALIZATE ===== */
+/* Pagina Adauga material si toate formularele secundare: dark real, contrast ridicat. */
+#addMaterialPage,
+#manageMaterialsPage,
+#globalSearchPage,
+#materialsPage,
+#equipmentPage,
+#typePage{
+  background:transparent !important;
+  color:#f8fafc !important;
+}
+#addMaterialPage > .panel,
+#manageMaterialsPage > .panel,
+.page > .panel{
+  background:linear-gradient(145deg,#0d1b34,#0a1730) !important;
+  border:1px solid #263d63 !important;
+  color:#f8fafc !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.20) !important;
+}
+#addMaterialPage .section-label,
+#addMaterialPage .equipment-select-block h3,
+#addMaterialPage .choice-row label,
+#addMaterialPage .checkbox-grid label{
+  color:#f8fafc !important;
+}
+#addMaterialPage .choice-row label,
+#addMaterialPage .checkbox-grid label{
+  background:#12213c !important;
+  border:1px solid #2d446b !important;
+  opacity:1 !important;
+}
+#addMaterialPage input,
+#addMaterialPage textarea,
+#addMaterialPage select{
+  background:#08162c !important;
+  color:#f8fafc !important;
+  border:1px solid #314b76 !important;
+  opacity:1 !important;
+}
+#addMaterialPage input::placeholder,
+#addMaterialPage textarea::placeholder{color:#9fb0cc !important;opacity:1 !important}
+#addMaterialPage select option{background:#08162c !important;color:#f8fafc !important}
+#addMaterialPage input[type="checkbox"]{accent-color:#8b5cf6 !important;filter:none !important}
+
+/* Egalizare VIZUALA: Carrefour este micsorat, Express ramane reper. */
+.support-zone-card.support-card-carrefour > .support-zone-visual > img{
+  width:220px !important;
+  height:155px !important;
+  max-width:72% !important;
+  max-height:70% !important;
+  object-fit:contain !important;
+}
+.support-zone-card.support-card-franciza > .support-zone-visual > img{
+  width:250px !important;
+  height:175px !important;
+  max-width:78% !important;
+  max-height:74% !important;
+  object-fit:contain !important;
+}
+/* SmartID: nu mai este imagine dreptunghiulara lipita. Este mascata/fade in fundalul mov. */
+.support-zone-card.support-card-intern > .support-zone-visual{
+  padding:28px !important;
+  background:radial-gradient(ellipse at center,rgba(139,92,246,.18),rgba(23,16,45,.30) 52%,transparent 78%) !important;
+}
+.support-zone-card.support-card-intern > .support-zone-visual > img{
+  display:block !important;
+  width:250px !important;
+  height:175px !important;
+  max-width:78% !important;
+  max-height:74% !important;
+  object-fit:contain !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:drop-shadow(0 18px 28px rgba(0,0,0,.22)) !important;
+  -webkit-mask-image:radial-gradient(ellipse 72% 72% at 50% 50%,#000 48%,rgba(0,0,0,.92) 62%,transparent 100%) !important;
+  mask-image:radial-gradient(ellipse 72% 72% at 50% 50%,#000 48%,rgba(0,0,0,.92) 62%,transparent 100%) !important;
+}
+.support-zone-card.support-card-intern > .support-zone-visual > .support-zone-glow{display:block !important;background:#8b5cf6 !important;opacity:.16 !important}
