@@ -427,6 +427,8 @@ async function continueWithStore() {
   currentStoreFormat = store.format || "";
   el("storeModal").classList.remove("open");
   await finishLogin();
+  // Dupa alegerea ID-ului/geolocalizarii actualizam imediat numele din dreapta.
+  if (typeof syncProductionHeader === "function") syncProductionHeader();
 
   showPage(currentRole === "admin" ? "dashboardPage" : "equipmentPage");
 }
@@ -1764,7 +1766,11 @@ function applyFinalIdentityLayout(){
 
   // In dreapta afisam numele real al utilizatorului conectat, indiferent de rol.
   if(badge){
-    badge.textContent = currentDisplayName || currentEmail || "Utilizator";
+    const cleanStoreName = String(currentStoreName || "").trim();
+    if(currentRole === "suport") badge.textContent = "SUPORT";
+    else if(currentRole === "franciza") badge.textContent = cleanStoreName ? `Franciză ${cleanStoreName}` : "Franciză";
+    else if(currentRole === "carrefour") badge.textContent = cleanStoreName ? `Carrefour ${cleanStoreName}` : "Carrefour";
+    else badge.textContent = currentDisplayName || "Utilizator";
     badge.dataset.role = currentRole;
     badge.classList.remove("hidden");
   }
@@ -1840,7 +1846,13 @@ function syncProductionHeader(){
   if(manage){manage.classList.toggle('hidden',!canUseMaterials);manage.style.display=canUseMaterials?'inline-flex':'none';}
   if(add){add.classList.toggle('hidden',!canUseMaterials);add.style.display=canUseMaterials?'inline-flex':'none';}
   if(badge){
-    badge.textContent=currentDisplayName || currentEmail || (currentRole==='admin'?'Admin':'Utilizator');
+    // Header final: nu afisam emailurile. Pentru magazine folosim magazinul selectat.
+    const cleanStoreName = String(currentStoreName || '').trim();
+    if(currentRole === 'admin') badge.textContent = 'ADMIN';
+    else if(currentRole === 'suport') badge.textContent = 'SUPORT';
+    else if(currentRole === 'franciza') badge.textContent = cleanStoreName ? `Franciză ${cleanStoreName}` : 'Franciză';
+    else if(currentRole === 'carrefour') badge.textContent = cleanStoreName ? `Carrefour ${cleanStoreName}` : 'Carrefour';
+    else badge.textContent = currentDisplayName || 'Utilizator';
     badge.dataset.role=currentRole;
     badge.classList.remove('hidden');
     badge.style.display='inline-flex';
