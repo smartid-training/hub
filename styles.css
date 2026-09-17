@@ -2292,3 +2292,36 @@ body.role-admin main.content{margin-left:0!important;width:100%!important;max-wi
 body.role-admin header.topbar{padding-left:76px!important}
 body.role-admin #menuBtn.menu-btn{display:inline-flex!important;visibility:visible!important;opacity:1!important;position:fixed!important;left:20px!important;top:18px!important;z-index:10002!important}
 body.role-admin #sidebar .close-menu{display:grid!important;place-items:center!important}
+
+/* ===== TARGETED FINAL FIX 17.09 v4: add form dark + visual logo balance ===== */
+body.role-admin #addMaterialPage .panel{
+  background:linear-gradient(180deg,rgba(13,30,58,.96),rgba(8,21,42,.98))!important;
+  border:1px solid rgba(148,163,184,.22)!important;
+  box-shadow:0 22px 55px rgba(2,8,23,.28)!important;
+  color:#fff!important;
+}
+body.role-admin #addMaterialPage .section-label,
+body.role-admin #addMaterialPage .equipment-select-block h3{color:#fff!important}
+body.role-admin #addMaterialPage input,
+body.role-admin #addMaterialPage select,
+body.role-admin #addMaterialPage textarea{
+  background:rgba(4,15,32,.78)!important;
+  border-color:rgba(148,163,184,.28)!important;
+  color:#fff!important;
+}
+body.role-admin #addMaterialPage input::placeholder,
+body.role-admin #addMaterialPage textarea::placeholder{color:#94a3b8!important}
+body.role-admin #addMaterialPage select option{background:#0b1830!important;color:#fff!important}
+body.role-admin #addMaterialPage .choice-row label,
+body.role-admin #addMaterialPage .checkbox-grid label{
+  background:rgba(124,58,237,.10)!important;
+  border:1px solid rgba(167,139,250,.14)!important;
+  color:#f8fafc!important;
+}
+body.role-admin #addMaterialPage .choice-row input,
+body.role-admin #addMaterialPage .checkbox-grid input{accent-color:#8b5cf6!important}
+
+/* Equal apparent logo scale: same visual frame, compensated for intrinsic whitespace. */
+.support-zone-card.support-card-carrefour>.support-zone-visual>img{width:218px!important;height:154px!important;max-width:74%!important}
+.support-zone-card.support-card-franciza>.support-zone-visual>img{width:260px!important;height:180px!important;max-width:82%!important}
+.support-zone-card.support-card-intern>.support-zone-visual>img{width:244px!important;height:170px!important;max-width:79%!important}
