@@ -2276,3 +2276,19 @@ body.role-admin .content{margin-left:0!important;width:100%!important}
 body.role-admin .topbar{padding-left:76px!important}
 body.role-admin .menu-btn{display:inline-flex!important;position:fixed;left:20px;top:18px;z-index:220}
 body.role-admin .menu-overlay.open{display:block!important}
+
+
+/* ===== ADMIN DRAWER HARD FIX 17.09 v3 ===== */
+body.role-admin #sidebar.sidebar{
+  position:fixed!important;left:0!important;top:0!important;bottom:0!important;
+  display:flex!important;flex-direction:column!important;width:270px!important;height:100vh!important;
+  transform:translate3d(-110%,0,0)!important;visibility:visible!important;opacity:1!important;
+  transition:transform .22s ease!important;z-index:10001!important;
+}
+body.role-admin #sidebar.sidebar.open{transform:translate3d(0,0,0)!important}
+body.role-admin #menuOverlay.menu-overlay{display:none!important;position:fixed!important;inset:0!important;z-index:10000!important;background:rgba(2,8,23,.48)!important}
+body.role-admin #menuOverlay.menu-overlay.open{display:block!important}
+body.role-admin main.content{margin-left:0!important;width:100%!important;max-width:none!important}
+body.role-admin header.topbar{padding-left:76px!important}
+body.role-admin #menuBtn.menu-btn{display:inline-flex!important;visibility:visible!important;opacity:1!important;position:fixed!important;left:20px!important;top:18px!important;z-index:10002!important}
+body.role-admin #sidebar .close-menu{display:grid!important;place-items:center!important}

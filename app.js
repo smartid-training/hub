@@ -238,6 +238,9 @@ setTimeout(syncSupportColleagueLayout,0);
     document.querySelectorAll(".admin-preview-actions,[data-export-dashboard],.metric-export").forEach(n=>n.remove());
     if (sidebarSubtitle) sidebarSubtitle.textContent = "Administrare SmartID Portal";
     if (hero) hero.innerHTML = "";
+    // Admin: meniul lateral porneste INTOTDEAUNA inchis si apare doar la apasarea butonului ☰.
+    el("sidebar")?.classList.remove("open");
+    el("menuOverlay")?.classList.remove("open");
     return;
   }
 
