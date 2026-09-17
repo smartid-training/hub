@@ -2258,3 +2258,21 @@ body.role-admin .content{margin-left:270px!important;width:calc(100% - 270px)!im
 body.role-admin .topbar{padding-left:286px!important}
 body.role-admin #userRoleBadge{display:inline-flex!important}
 body.role-admin #currentUserName{display:none!important}
+
+
+/* ===== ADMIN SIDEBAR DRAWER FINAL 17.09 ===== */
+body.role-admin .sidebar{
+  display:flex!important;
+  transform:translateX(-105%)!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:270px!important;
+  transition:transform .25s ease!important;
+  box-shadow:18px 0 50px rgba(2,8,23,.45)!important;
+}
+body.role-admin .sidebar.open{transform:translateX(0)!important}
+body.role-admin .sidebar .close-menu{display:block!important}
+body.role-admin .content{margin-left:0!important;width:100%!important}
+body.role-admin .topbar{padding-left:76px!important}
+body.role-admin .menu-btn{display:inline-flex!important;position:fixed;left:20px;top:18px;z-index:220}
+body.role-admin .menu-overlay.open{display:block!important}
