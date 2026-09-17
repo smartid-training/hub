@@ -202,15 +202,6 @@ async function recordSession() {
 }
 
 
-function storeIdentityLabel(){
-  const name=String(currentStoreName||"").trim();
-  if(!name) return currentDisplayName || currentEmail || "Utilizator";
-  const lower=name.toLowerCase();
-  if(currentRole==="franciza") return lower.includes("franciz") ? name : `Franciză ${name}`;
-  if(currentRole==="carrefour") return lower.includes("carrefour") ? name : `Carrefour ${name}`;
-  return name;
-}
-
 function configureAccountIdentity() {
 setTimeout(enforceSupportHeader,0);
 setTimeout(syncSupportColleagueLayout,0);
@@ -487,7 +478,7 @@ function renderPortalLandingForRole() {
     {
       category: "suport",
       title: "PROCEDURI INTERNE",
-      logo: "smartid-logo-visual-fade.png",
+      logo: "smartid-logo-visual.jfif",
       visualClass: "support-card-intern"
     }
   ];
@@ -1773,7 +1764,7 @@ function applyFinalIdentityLayout(){
 
   // In dreapta afisam numele real al utilizatorului conectat, indiferent de rol.
   if(badge){
-    badge.textContent = (currentRole === "carrefour" || currentRole === "franciza") ? storeIdentityLabel() : (currentDisplayName || currentEmail || "Utilizator");
+    badge.textContent = currentDisplayName || currentEmail || "Utilizator";
     badge.dataset.role = currentRole;
     badge.classList.remove("hidden");
   }
@@ -1849,7 +1840,7 @@ function syncProductionHeader(){
   if(manage){manage.classList.toggle('hidden',!canUseMaterials);manage.style.display=canUseMaterials?'inline-flex':'none';}
   if(add){add.classList.toggle('hidden',!canUseMaterials);add.style.display=canUseMaterials?'inline-flex':'none';}
   if(badge){
-    badge.textContent = currentRole==='admin' ? 'ADMIN' : ((currentRole==='carrefour'||currentRole==='franciza') ? storeIdentityLabel() : (currentDisplayName || currentEmail || 'Utilizator'));
+    badge.textContent=currentDisplayName || currentEmail || (currentRole==='admin'?'Admin':'Utilizator');
     badge.dataset.role=currentRole;
     badge.classList.remove('hidden');
     badge.style.display='inline-flex';
@@ -2118,171 +2109,3 @@ dashboardRows=function(key){
     Data:dashboardTimestamp(x.updatedAt||x.createdAt)
   }));
 };
-
-
-/* ===== SMARTID RC FINAL 15.09 — corectii cerute ===== */
-function smartHome(){
-  smartPageHistory=[];
-  if(currentRole==='admin'){ showPage('dashboardPage'); loadDashboard(); return; }
-  renderEquipment(); showPage('equipmentPage');
-}
-
-// Admin: un singur preview care arata Carrefour + Franciza + Proceduri interne.
-document.getElementById('previewAllUsersBtn')?.addEventListener('click',()=>enterAdminPreview('suport'));
-
-// Identitate: Admin = ADMIN; ceilalti = displayName (fallback email doar daca profilul nu are nume).
-function applyRequestedIdentity(){
-  const badge=document.getElementById('userRoleBadge');
-  if(!badge) return;
-  badge.textContent = currentRole==='admin' ? 'ADMIN' : ((currentRole==='carrefour'||currentRole==='franciza') ? storeIdentityLabel() : (currentDisplayName || currentEmail || 'Utilizator'));
-  badge.dataset.role=currentRole;
-  badge.classList.remove('hidden'); badge.style.display='inline-flex';
-  const canMaterial = currentRole==='admin' || (currentRole==='suport' && currentCanAdd);
-  ['headerManageMaterialsBtn','headerAddMaterialBtn'].forEach(id=>{
-    const b=document.getElementById(id); if(!b)return;
-    b.classList.toggle('hidden',!canMaterial); b.style.display=canMaterial?'inline-flex':'none';
-  });
-}
-const rcConfigure=configureAccountIdentity;
-configureAccountIdentity=function(){ rcConfigure(); setTimeout(applyRequestedIdentity,30); };
-setTimeout(applyRequestedIdentity,80);
-
-// Pentru useri nu permitem pagina intermediara goala "Categorii echipamente".
-const rcShowPage=showPage;
-showPage=function(id){
-  if(id==='materialTypePage' && currentRole!=='admin' && !adminPreviewRole){
-    renderEquipment(); return rcShowPage('equipmentPage');
-  }
-  return rcShowPage(id);
-};
-
-// Material inexistent: mesaj, apoi direct acasa, fara doua niveluri de back.
-const rcRenderSelected=renderSelectedMaterials;
-renderSelectedMaterials=function(){
-  const result=rcRenderSelected();
-  if(currentRole!=='admin' && !adminPreviewRole){
-    const grid=document.getElementById('materialsGrid');
-    if(grid && grid.querySelector('.empty')){
-      const type=selectedMaterialType==='videoclip'?'videoclip':'procedură';
-      setTimeout(()=>{ alert(`Nu există ${type} disponibil(ă) pentru această selecție.`); smartHome(); },0);
-    }
-  }
-  return result;
-};
-
-// Export activitate echipa.
-function teamRows(){
-  const rows=[];
-  document.querySelectorAll('#contributorsList .team-member-row').forEach((row,i)=>{
-    const name=row.querySelector('.team-member-name b')?.textContent?.trim()||'';
-    const pills=[...row.querySelectorAll('.metric-pill')].map(x=>x.textContent.trim());
-    const total=Number((row.querySelector('.team-member-name small')?.textContent||'').match(/\d+/)?.[0]||0);
-    rows.push({Loc:i+1,Coleg:name,Total_materiale:total,Videoclipuri:pills.find(x=>x.includes('videoclip'))?.match(/\d+/)?.[0]||0,Proceduri:pills.find(x=>x.includes('procedur'))?.match(/\d+/)?.[0]||0});
-  });
-  return rows;
-}
-function writeExcel(rows,name){
-  if(!rows.length){alert('Nu există date de exportat.');return;}
-  if(!window.XLSX){alert('Modulul Excel nu s-a încărcat.');return;}
-  const ws=XLSX.utils.json_to_sheet(rows), wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Date'); XLSX.writeFile(wb,`${name}_${new Date().toISOString().slice(0,10)}.xlsx`);
-}
-document.getElementById('exportTeamBtn')?.addEventListener('click',()=>writeExcel(teamRows(),'SmartID_Activitate_Echipa'));
-
-// Export din Gestionare materiale, disponibil acelora care au acces la pagina.
-document.getElementById('exportManageMaterialsBtn')?.addEventListener('click',()=>{
-  const rows=materials.filter(m=>currentRole==='admin' || (currentRole==='suport' && (m.createdBy===currentEmail || currentCanManage))).map(m=>({
-    Titlu:m.title||'',Tip:normType(m.type)==='videoclip'?'Videoclip':'Procedură',Descriere:m.description||'',Taguri:m.tags||'',Categorii:(m.categories||[]).join(', '),Echipamente:(m.equipment||[]).join(', '),Status:m.status||'approved',Autor:displayUser(m.createdBy),Vizualizari:Number(m.views||0)
-  }));
-  writeExcel(rows,'SmartID_Materiale');
-});
-
-// Include Activitate echipa in mecanismul de export Dashboard daca este folosit programatic.
-const rcDashboardRows=dashboardRows;
-dashboardRows=function(key){ if(key==='team') return teamRows(); return rcDashboardRows(key); };
-
-// Reaplica identitatea dupa login complet.
-const rcFinishLogin=finishLogin;
-finishLogin=async function(){ const r=await rcFinishLogin(); setTimeout(applyRequestedIdentity,50); return r; };
-
-
-/* ===== FINAL FIX 15.09 — SIDEBAR + STORE NAME + LOGO BALANCE ===== */
-function applyFinalPortalChrome(){
-  document.body.classList.remove('persistent-portal-sidebar');
-  const sidebar=document.getElementById('sidebar');
-  const menu=document.getElementById('menuBtn');
-  const badge=document.getElementById('userRoleBadge');
-  const colleagueSidebar = currentRole==='suport' && currentCanAdd;
-  const persistent = currentRole==='admin' || colleagueSidebar;
-  if(sidebar){
-    sidebar.classList.toggle('persistent',persistent);
-    sidebar.classList.toggle('open',persistent);
-  }
-  document.body.classList.toggle('persistent-portal-sidebar',persistent);
-  if(menu) menu.style.display='none';
-
-  // User normal: numele magazinului selectat, nu emailul contului.
-  if(badge){
-    if(currentRole==='admin') badge.textContent='ADMIN';
-    else if(currentRole==='carrefour'||currentRole==='franciza') badge.textContent=storeIdentityLabel();
-    else badge.textContent=currentDisplayName || currentEmail || 'Utilizator';
-    badge.classList.remove('hidden'); badge.style.display='inline-flex';
-  }
-
-  // Headerul ramane curat; Gestionare/Adaugare sunt exclusiv in sidebar.
-  ['headerManageMaterialsBtn','headerAddMaterialBtn','supportManageBtn'].forEach(id=>{
-    const b=document.getElementById(id); if(b){b.classList.add('hidden');b.style.display='none';}
-  });
-
-  // Sidebar: admin are meniul complet; colegii vad strict actiunile permise.
-  document.querySelectorAll('#sidebar .side-btn').forEach(btn=>{
-    const page=btn.dataset.page;
-    let visible=false;
-    if(currentRole==='admin') visible=true;
-    else if(colleagueSidebar){
-      if(page==='addMaterialPage') visible=!!currentCanAdd;
-      if(page==='manageMaterialsPage') visible=!!currentCanAdd;
-    }
-    btn.classList.toggle('hidden',!visible);
-  });
-}
-const _finalConfigureAccountIdentity=configureAccountIdentity;
-configureAccountIdentity=function(){ _finalConfigureAccountIdentity(); setTimeout(applyFinalPortalChrome,50); };
-setTimeout(applyFinalPortalChrome,120);
-
-/* ===== HOTFIX ADMIN HEADER CLEAN =====
-   Gestionare/Adaugare exista exclusiv in sidebar pentru Admin si colegii autorizati.
-*/
-function enforceCleanTopbarFinal(){
-  const topbar=document.querySelector('.topbar');
-  if(!topbar) return;
-  topbar.querySelectorAll('button,a').forEach(node=>{
-    const label=(node.textContent||'').replace(/\s+/g,' ').trim().toLowerCase();
-    if(label.includes('gestionare material') || label.includes('adăug') || label.includes('adaug')){
-      node.style.setProperty('display','none','important');
-      node.classList.add('hidden');
-    }
-  });
-}
-enforceCleanTopbarFinal();
-new MutationObserver(enforceCleanTopbarFinal).observe(document.querySelector('.topbar')||document.body,{childList:true,subtree:true});
-
-/* FIX FINAL — Admin preview = o singura vizualizare, fara selector Carrefour/Franciza/Support */
-(function(){
-  const previewBtn=document.getElementById('previewAllUsersBtn');
-  if(previewBtn){
-    const clean=previewBtn.cloneNode(true);
-    previewBtn.replaceWith(clean);
-    clean.addEventListener('click',()=>{
-      document.body.classList.add('admin-user-preview');
-      enterAdminPreview('suport');
-      document.getElementById('adminCategoryChooser')?.classList.add('hidden');
-      document.getElementById('accountHero')?.classList.add('hidden');
-      const head=document.querySelector('#equipmentPage > .page-head');
-      if(head) head.style.setProperty('display','none','important');
-    });
-  }
-  const exit=document.getElementById('exitAdminPreviewBtn');
-  if(exit){
-    exit.addEventListener('click',()=>document.body.classList.remove('admin-user-preview'));
-  }
-})();

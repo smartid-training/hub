@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=clean-preview-0915-1650">
+  <link rel="stylesheet" href="styles.css?v=FEEDBACK-1509">
 </head>
 <body>
   <main id="loginPage" class="login-page">
@@ -40,7 +40,8 @@
       <div class="brand-row">
         <button id="menuBtn" class="menu-btn hidden" aria-label="Meniu">☰</button>
         <strong class="brand">SmartID Portal</strong>
-        
+        <button id="headerManageMaterialsBtn" class="header-action-btn hidden" type="button">Gestionare materiale</button>
+        <button id="headerAddMaterialBtn" class="header-action-btn header-add-btn hidden" type="button">＋ Adaugă material</button>
       </div>
       <div class="top-actions">
         <div class="search-wrap">
@@ -78,7 +79,10 @@
           <div class="dashboard-pro-badges">
             <span class="status-chip"><i></i> Portal activ</span>
             <div class="admin-preview-actions">
-              <button type="button" id="previewAllUsersBtn">Vezi pagina ca user</button>
+              <span>Vezi pagina ca user:</span>
+              <button type="button" data-preview-role="carrefour">Carrefour</button>
+              <button type="button" data-preview-role="franciza">Franciză</button>
+              <button type="button" data-preview-role="suport">Suport</button>
             </div>
           </div>
         </div>
@@ -154,11 +158,11 @@
             <div class="metric-icon">✓</div>
             <div class="metric-copy">
               <strong id="statPending">0</strong>
-              <h3>Aprobări</h3>
+              <h3>De aprobat</h3>
               <p>Materiale încărcate de colegi care așteaptă aprobarea Adminului principal.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <button class="metric-details" data-stat-details="pending">Vezi aprobările ›</button><button class="metric-export" data-export-dashboard="pending" type="button">Export Excel</button>
+            <button class="metric-details" data-stat-details="pending">Deschide de aprobat ›</button><button class="metric-export" data-export-dashboard="pending" type="button">Export Excel</button>
           </article>
         </div>
 
@@ -166,8 +170,7 @@
           <div class="panel-head">
             <div>
               <h2>Activitate echipă</h2>
-              <p class="subtitle">Top colegi după numărul de materiale încărcate.</p>
-              <button class="team-export-btn" id="exportTeamBtn" type="button">Export Excel</button>
+              <p class="subtitle">Materialele încărcate de fiecare coleg.</p>
             </div>
           </div>
 
@@ -430,7 +433,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script type="module" src="app.js?v=clean-preview-0915-1650"></script>
+  <script type="module" src="app.js?v=FEEDBACK-1509"></script>
 
   <div id="dashboardDetailsModal" class="modal">
     <section class="modal-card dashboard-details-modal">
