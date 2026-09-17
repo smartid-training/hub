@@ -40,8 +40,6 @@
       <div class="brand-row">
         <button id="menuBtn" class="menu-btn hidden" aria-label="Meniu">☰</button>
         <strong class="brand">SmartID Portal</strong>
-        <button id="headerManageMaterialsBtn" class="header-action-btn hidden" type="button">Gestionare materiale</button>
-        <button id="headerAddMaterialBtn" class="header-action-btn header-add-btn hidden" type="button">＋ Adaugă material</button>
       </div>
       <div class="top-actions">
         <div class="search-wrap">
@@ -58,14 +56,21 @@
     <div id="menuOverlay" class="menu-overlay"></div>
     <aside id="sidebar" class="sidebar">
       <button id="closeMenuBtn" class="close-menu">×</button>
-      <h2>Meniu</h2>
-      <p id="sidebarSubtitle" class="sidebar-subtitle">Administrare SmartID Portal</p>
-      <button class="side-btn" data-page="dashboardPage">📊 Dashboard</button>
-      <button class="side-btn" data-page="addMaterialPage" data-permission="add">＋ Adăugare materiale</button>
-       <button class="side-btn" data-page="manageMaterialsPage" data-permission="manage">🗂 Gestionare materiale</button>
-       <button class="side-btn" data-page="usersPage" data-permission="users">👥 Utilizatori</button>
-      <button class="side-btn" data-page="storesPage">🏪 Administrare magazine</button>
-      <button class="side-btn" data-page="geoAdminPage" data-permission="users">📍 Geolocalizare</button>
+      <div class="sidebar-brand"><span class="sidebar-brand-mark">S</span><div><strong>SmartID Portal</strong><small>Administrare</small></div></div>
+      <button class="side-btn" data-page="dashboardPage"><span class="side-icon">⌂</span><span>Dashboard</span></button>
+      <button class="side-btn" data-page="manageMaterialsPage" data-permission="manage"><span class="side-icon">▣</span><span>Gestionare materiale</span></button>
+      <button class="side-btn" data-page="addMaterialPage" data-permission="add"><span class="side-icon">＋</span><span>Adăugare material</span></button>
+      <button class="side-btn" data-page="geoAdminPage" data-permission="users"><span class="side-icon">⌖</span><span>Geolocalizare</span></button>
+      <button class="side-btn" data-page="usersPage" data-permission="users"><span class="side-icon">♟</span><span>Utilizatori</span></button>
+      <button class="side-btn" data-page="storesPage"><span class="side-icon">▦</span><span>Administrare magazine</span></button>
+      <div class="sidebar-divider"></div>
+      <button id="adminPreviewMenuBtn" class="side-btn preview-user-btn" type="button"><span class="side-icon">◉</span><span>Vezi ca utilizator</span><span class="side-arrow">›</span></button>
+      <div id="adminPreviewChoices" class="preview-choices hidden">
+        <button type="button" data-preview-role="carrefour">Carrefour</button>
+        <button type="button" data-preview-role="franciza">Franciză</button>
+        <button type="button" data-preview-role="suport">Suport / colegi</button>
+      </div>
+      <div class="sidebar-footer">Smart ID Dynamics<br><small>v1.0</small></div>
     </aside>
 
     <main class="content">
@@ -78,12 +83,6 @@
           </div>
           <div class="dashboard-pro-badges">
             <span class="status-chip"><i></i> Portal activ</span>
-            <div class="admin-preview-actions">
-              <span>Vezi pagina ca user:</span>
-              <button type="button" data-preview-role="carrefour">Carrefour</button>
-              <button type="button" data-preview-role="franciza">Franciză</button>
-              <button type="button" data-preview-role="suport">Suport</button>
-            </div>
           </div>
         </div>
 
@@ -96,7 +95,7 @@
               <p>Arată de câte ori s-au autentificat utilizatorii în SmartID Portal.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <button class="metric-details" data-stat-details="logins">Vezi cine s-a autentificat ›</button><button class="metric-export" data-export-dashboard="logins" type="button">Export Excel</button>
+            <button class="metric-details" data-stat-details="logins">Vezi cine s-a autentificat ›</button>
           </article>
 
           <article class="dashboard-pro-card card-stores">
@@ -107,7 +106,7 @@
               <p>Află câte magazine distincte au accesat portalul.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <button class="metric-details" data-stat-details="stores">Vezi magazinele ›</button><button class="metric-export" data-export-dashboard="stores" type="button">Export Excel</button>
+            <button class="metric-details" data-stat-details="stores">Vezi magazinele ›</button>
           </article>
 
           <article class="dashboard-pro-card card-videos">
@@ -118,7 +117,7 @@
               <p>Arată numărul total de accesări ale videoclipurilor.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <button class="metric-details" data-stat-details="videos">Vezi cele vizionate ›</button><button class="metric-export" data-export-dashboard="videos" type="button">Export Excel</button>
+            <button class="metric-details" data-stat-details="videos">Vezi cele vizionate ›</button>
           </article>
 
           <article class="dashboard-pro-card card-procedures">
@@ -129,7 +128,7 @@
               <p>Arată numărul total de accesări ale procedurilor.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <button class="metric-details" data-stat-details="procedures">Vezi procedurile ›</button><button class="metric-export" data-export-dashboard="procedures" type="button">Export Excel</button>
+            <button class="metric-details" data-stat-details="procedures">Vezi procedurile ›</button>
           </article>
 
           <article class="dashboard-pro-card card-shares">
@@ -140,7 +139,7 @@
               <p>Arată de câte ori au fost distribuite materialele din portal.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <button class="metric-details" data-stat-details="shares">Vezi distribuirile ›</button><button class="metric-export" data-export-dashboard="shares" type="button">Export Excel</button>
+            <button class="metric-details" data-stat-details="shares">Vezi distribuirile ›</button>
           </article>
 
           <article class="dashboard-pro-card card-feedback">
@@ -151,7 +150,7 @@
               <p>Vezi reacțiile și comentariile primite pentru materiale.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <button class="metric-details" data-stat-details="feedback">Vezi feedback-ul ›</button><button class="metric-export" data-export-dashboard="feedback" type="button">Export Excel</button>
+            <button class="metric-details" data-stat-details="feedback">Vezi feedback-ul ›</button>
           </article>
 
           <article class="dashboard-pro-card card-pending">
@@ -162,7 +161,7 @@
               <p>Materiale încărcate de colegi care așteaptă aprobarea Adminului principal.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <button class="metric-details" data-stat-details="pending">Deschide de aprobat ›</button><button class="metric-export" data-export-dashboard="pending" type="button">Export Excel</button>
+            <button class="metric-details" data-stat-details="pending">Deschide de aprobat ›</button>
           </article>
         </div>
 
@@ -433,13 +432,13 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script type="module" src="app.js?v=20260917-header-store-2"></script>
+  <script type="module" src="app.js?v=20260917-admin-stable-1"></script>
 
   <div id="dashboardDetailsModal" class="modal">
     <section class="modal-card dashboard-details-modal">
       <div class="shares-modal-head">
         <div><h2 id="dashboardDetailsTitle">Detalii</h2><p id="dashboardDetailsSubtitle"></p><input id="dashboardDetailsSearch" class="dashboard-details-search" placeholder="Caută în aceste rezultate..."></div>
-        <button id="closeDashboardDetailsBtn" class="back-btn">Închide</button>
+        <div class="dashboard-details-actions"><button id="dashboardDetailsExportBtn" class="details-export-btn" type="button">Export Excel</button><button id="closeDashboardDetailsBtn" class="back-btn">Închide</button></div>
       </div>
       <div id="dashboardDetailsBody" class="dashboard-details-body"></div>
     </section>

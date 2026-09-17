@@ -2121,3 +2121,30 @@ dashboardRows=function(key){
     Data:dashboardTimestamp(x.updatedAt||x.createdAt)
   }));
 };
+
+/* ===== ADMIN STABLE UX 17.09 ===== */
+(function(){
+  const previewMenu=document.getElementById('adminPreviewMenuBtn');
+  const previewChoices=document.getElementById('adminPreviewChoices');
+  previewMenu?.addEventListener('click',()=>previewChoices?.classList.toggle('hidden'));
+
+  // Exportul exista numai in pagina de detalii deschisa prin "Vezi...".
+  let activeDashboardExportKey='';
+  document.querySelectorAll('[data-stat-details]').forEach(btn=>{
+    btn.addEventListener('click',()=>{activeDashboardExportKey=btn.dataset.statDetails||'';},true);
+  });
+  document.getElementById('dashboardDetailsExportBtn')?.addEventListener('click',()=>{
+    if(activeDashboardExportKey) exportDashboardExcel(activeDashboardExportKey);
+  });
+
+  // Header Admin: un singur identificator, ADMIN, fara actiuni de materiale sus.
+  const stableHeaderBase=syncProductionHeader;
+  syncProductionHeader=function(){
+    stableHeaderBase();
+    if(currentRole==='admin'){
+      const badge=document.getElementById('userRoleBadge');
+      if(badge){badge.textContent='ADMIN';badge.classList.remove('hidden');badge.style.display='inline-flex';}
+      ['headerManageMaterialsBtn','headerAddMaterialBtn'].forEach(id=>{const n=document.getElementById(id);if(n){n.classList.add('hidden');n.style.display='none';}});
+    }
+  };
+})();
