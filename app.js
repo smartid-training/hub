@@ -230,7 +230,12 @@ setTimeout(syncSupportColleagueLayout,0);
   document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
 
   if (currentRole === "admin") {
-    badge?.classList.add("hidden");
+    document.body.classList.remove("role-suport","role-carrefour","role-franciza");
+    document.body.classList.add("role-admin");
+    if (badge) { badge.textContent = "ADMIN"; badge.dataset.role = "admin"; badge.classList.remove("hidden"); badge.style.display = "inline-flex"; }
+    // Admin: actiunile de materiale exista numai in meniul lateral.
+    ["headerManageMaterialsBtn","headerAddMaterialBtn"].forEach(id => { const n=document.getElementById(id); if(n) n.remove(); });
+    document.querySelectorAll(".admin-preview-actions,[data-export-dashboard],.metric-export").forEach(n=>n.remove());
     if (sidebarSubtitle) sidebarSubtitle.textContent = "Administrare SmartID Portal";
     if (hero) hero.innerHTML = "";
     return;
