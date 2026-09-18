@@ -978,8 +978,8 @@ function dashboardTimestamp(value) {
 function openDashboardDetails(title, subtitle, rows) {
   el("dashboardDetailsTitle").textContent = title;
   el("dashboardDetailsSubtitle").textContent = subtitle || "";
-  el("dashboardDetailsBody").innerHTML = rows.length ? rows.map(row => `
-    <div class="dashboard-detail-row">
+  el("dashboardDetailsBody").innerHTML = rows.length ? rows.map((row,index) => `
+    <div class="dashboard-detail-row"><span class="dashboard-detail-rank">${index+1}</span>
       <div class="dashboard-detail-main"><b>${escapeHtml(row.title || "—")}</b><span>${escapeHtml(row.detail || "")}</span></div>
       <small>${escapeHtml(row.when || "")}</small>
     </div>`).join("") : '<div class="empty">Nu există încă informații.</div>';
@@ -2004,7 +2004,7 @@ function filterDashboardDetailRows(){
   const rows=!q?prodDashboardRows:prodDashboardRows.filter(r=>[r.title,r.detail,r.when].join(' ').toLowerCase().includes(q));
   const body=document.getElementById('dashboardDetailsBody');
   if(!body)return;
-  body.innerHTML=rows.length?rows.map(row=>`<div class="dashboard-detail-row"><div class="dashboard-detail-main"><b>${escapeHtml(row.title||'—')}</b><span>${escapeHtml(row.detail||'')}</span></div><small>${escapeHtml(row.when||'')}</small></div>`).join(''):'<div class="empty">Nu există rezultate.</div>';
+  body.innerHTML=rows.length?rows.map((row,index)=>`<div class="dashboard-detail-row"><span class="dashboard-detail-rank">${index+1}</span><div class="dashboard-detail-main"><b>${escapeHtml(row.title||'—')}</b><span>${escapeHtml(row.detail||'')}</span></div><small>${escapeHtml(row.when||'')}</small></div>`).join(''):'<div class="empty">Nu există rezultate.</div>';
 }
 document.getElementById('dashboardDetailsSearch')?.addEventListener('input',filterDashboardDetailRows);
 
@@ -2217,15 +2217,15 @@ dashboardRows=function(key){
         const {sessions=[],views=[],shares=[],feedback=[]}=dashboardDetailCache||{};
         if(key==='logins'){
           const data=aggregateUsers(sessions);
-          openDashboardDetails('Autentificări',`${data.length} utilizatori · ${sessions.length} autentificări totale`,data.map(x=>({
+          openDashboardDetails('Top autentificări',`${data.length} utilizatori · ${sessions.length} autentificări totale`,data.map(x=>({
             title:displayUser(x.email)||x.email||'Utilizator',
-            detail:`${x.count} autentificări${x.role?` · ${x.role}`:''}${x.stores.size?` · ${[...x.stores].join(', ')}`:''}`,
+            detail:`${x.role?({admin:'Admin',suport:'Suport',carrefour:'Carrefour',franciza:'Franciză'}[x.role]||x.role)+' · ':''}${x.count} autentificări${x.stores.size?` · ${x.stores.size} ${x.stores.size===1?'magazin':'magazine'} · ${[...x.stores].join(' | ')}`:''}${x.email?` · ${x.email}`:''}`,
             when:`Ultima autentificare: ${dashboardTimestamp(x.last)}`
           })));
         } else if(key==='stores'){
           const data=aggregateStores(sessions);
           const uniqueUsers=new Set(sessions.map(x=>clean(x.email).toLowerCase()).filter(Boolean)).size;
-          openDashboardDetails('Magazine active',`${data.length} magazine · ${uniqueUsers} utilizatori · ${sessions.length} autentificări totale`,data.map(x=>({
+          openDashboardDetails('Top magazine active',`${data.length} magazine · ${uniqueUsers} utilizatori · ${sessions.length} autentificări totale`,data.map(x=>({
             title:`${x.name}${x.id?` · ID ${x.id}`:''}`,
             detail:`${x.count} autentificări · ${x.users.size} utilizatori${x.roles.size?` · ${[...x.roles].join(', ')}`:''}`,
             when:`Ultima accesare: ${dashboardTimestamp(x.last)}`
@@ -2235,7 +2235,7 @@ dashboardRows=function(key){
           const raw=views.filter(x=>normType(x.type)===type);
           const data=aggregateMaterials(views,type);
           const allUsers=new Set(raw.map(x=>clean(x.email).toLowerCase()).filter(Boolean)).size;
-          openDashboardDetails(key==='videos'?'Vizualizări videoclipuri':'Vizualizări proceduri',`${data.length} materiale vizualizate · ${raw.length} vizualizări totale · ${allUsers} utilizatori`,data.map(x=>({
+          openDashboardDetails(key==='videos'?'Top videoclipuri':'Top proceduri',`${data.length} materiale vizualizate · ${raw.length} vizualizări totale · ${allUsers} utilizatori`,data.map(x=>({
             title:x.title,
             detail:`${x.count} vizualizări · ${x.users.size} utilizatori${x.stores.size?` · ${x.stores.size} magazine`:''}`,
             when:`Ultima vizualizare: ${dashboardTimestamp(x.last)}`
@@ -2263,4 +2263,60 @@ dashboardRows=function(key){
     }
     return previousDashboardRows(key);
   };
+})();
+
+
+/* ===== RAPOARTE DASHBOARD TOP + SEARCH REAL 18.09 v8 ===== */
+(function(){
+  const _ts=v=>valueToMillis(v)||0;
+  const _clean=v=>String(v||'').trim();
+  const _role=v=>({admin:'Admin',suport:'Suport',carrefour:'Carrefour',franciza:'Franciză'}[String(v||'').toLowerCase()]||v||'—');
+  const _userName=email=>displayUser(email)||email||'Utilizator necunoscut';
+  let reportRows=[];
+
+  function renderReportRows(rows){
+    const body=document.getElementById('dashboardDetailsBody'); if(!body)return;
+    body.innerHTML=rows.length?rows.map((row,i)=>`<div class="dashboard-detail-row" data-report-search="${escapeHtml(row.search||'')}"><span class="dashboard-detail-rank">${i+1}</span><div class="dashboard-detail-main"><b>${escapeHtml(row.title||'—')}</b><span>${escapeHtml(row.detail||'')}</span></div><small>${escapeHtml(row.when||'')}</small></div>`).join(''):'<div class="empty">Nu există rezultate pentru căutarea introdusă.</div>';
+  }
+  function showReport(title,subtitle,rows){
+    reportRows=rows||[];
+    document.getElementById('dashboardDetailsTitle').textContent=title;
+    document.getElementById('dashboardDetailsSubtitle').textContent=subtitle||'';
+    const input=document.getElementById('dashboardDetailsSearch'); if(input){input.value='';input.placeholder='Caută nume, email, rol, magazin, ID sau material...';}
+    renderReportRows(reportRows);
+    document.getElementById('dashboardDetailsModal').classList.add('open');
+  }
+  function userTop(sessions){
+    const m=new Map();
+    sessions.forEach(x=>{const email=_clean(x.email).toLowerCase();const key=email||`${_clean(x.role)}|${_clean(x.storeId)}|${_clean(x.storeName)}`;if(!key)return;const v=m.get(key)||{email:_clean(x.email),role:_clean(x.role),count:0,last:null,stores:new Map()};v.count++;if(x.storeId||x.storeName){const sk=_clean(x.storeId)||_clean(x.storeName).toLowerCase();v.stores.set(sk,`${_clean(x.storeName)||'Magazin'}${x.storeId?` · ID ${_clean(x.storeId)}`:''}`)}if(!v.last||_ts(x.createdAt)>_ts(v.last)){v.last=x.createdAt;if(x.role)v.role=_clean(x.role)}m.set(key,v)});
+    return [...m.values()].sort((a,b)=>b.count-a.count||_ts(b.last)-_ts(a.last));
+  }
+  function storeTop(sessions){
+    const m=new Map();sessions.forEach(x=>{if(!x.storeId&&!x.storeName)return;const key=_clean(x.storeId)||_clean(x.storeName).toLowerCase();const v=m.get(key)||{name:_clean(x.storeName)||'Magazin',id:_clean(x.storeId),count:0,last:null,users:new Set(),roles:new Set()};v.count++;if(x.email)v.users.add(_clean(x.email).toLowerCase());if(x.role)v.roles.add(_role(x.role));if(!v.last||_ts(x.createdAt)>_ts(v.last))v.last=x.createdAt;m.set(key,v)});return [...m.values()].sort((a,b)=>b.count-a.count||_ts(b.last)-_ts(a.last));
+  }
+  function materialTop(views,type){
+    const m=new Map();views.filter(x=>normType(x.type)===type).forEach(x=>{const key=_clean(x.materialId)||`${type}|${_clean(x.title).toLowerCase()}`;if(!key)return;const v=m.get(key)||{title:_clean(x.title)||(type==='videoclip'?'Videoclip':'Procedură'),count:0,last:null,users:new Set(),stores:new Set()};v.count++;if(x.email)v.users.add(_clean(x.email).toLowerCase());if(x.storeId||x.storeName)v.stores.add(_clean(x.storeId)||_clean(x.storeName).toLowerCase());if(!v.last||_ts(x.createdAt)>_ts(v.last))v.last=x.createdAt;m.set(key,v)});return [...m.values()].sort((a,b)=>b.count-a.count||_ts(b.last)-_ts(a.last));
+  }
+
+  setupDashboardInteractions=function(){
+    document.querySelectorAll('[data-stat-details]').forEach(button=>{button.onclick=e=>{e.preventDefault();e.stopPropagation();const key=button.dataset.statDetails;const {sessions=[],views=[],shares=[],feedback=[]}=dashboardDetailCache||{};
+      if(key==='logins'){
+        const data=userTop(sessions), stores=new Set(sessions.map(x=>_clean(x.storeId)).filter(Boolean)).size;
+        showReport('Top autentificări',`${data.length} utilizatori · ${stores} magazine · ${sessions.length} autentificări totale`,data.map(x=>{const stores=[...x.stores.values()];const name=_userName(x.email);return {title:name,detail:`${_role(x.role)} · ${x.count} autentificări${stores.length?` · ${stores.length} ${stores.length===1?'magazin':'magazine'}`:''}`,when:`Ultima: ${dashboardTimestamp(x.last)}`,search:[name,x.email,_role(x.role),...stores,x.count].join(' ').toLowerCase()}}));
+      } else if(key==='stores'){
+        const data=storeTop(sessions);showReport('Top magazine active',`${data.length} magazine · ${sessions.length} autentificări totale`,data.map(x=>({title:`${x.name}${x.id?` · ID ${x.id}`:''}`,detail:`${x.count} autentificări · ${x.users.size} utilizatori distincți${x.roles.size?` · ${[...x.roles].join(', ')}`:''}`,when:`Ultima: ${dashboardTimestamp(x.last)}`,search:[x.name,x.id,x.count,...x.users,...x.roles].join(' ').toLowerCase()})));
+      } else if(key==='videos'||key==='procedures'){
+        const type=key==='videos'?'videoclip':'procedura', raw=views.filter(x=>normType(x.type)===type), data=materialTop(views,type);showReport(key==='videos'?'Top videoclipuri':'Top proceduri',`${data.length} materiale · ${raw.length} vizualizări totale`,data.map(x=>({title:x.title,detail:`${x.count} vizualizări · ${x.users.size} utilizatori distincți · ${x.stores.size} magazine`,when:`Ultima: ${dashboardTimestamp(x.last)}`,search:[x.title,x.count,...x.users,...x.stores].join(' ').toLowerCase()})));
+      } else if(key==='shares'){
+        const rows=[...shares].sort((a,b)=>_ts(b.createdAt)-_ts(a.createdAt)).map(x=>({title:x.title||'Material',detail:`${_userName(x.email)} · ${x.method||x.channel||'Distribuire'}`,when:dashboardTimestamp(x.createdAt),search:[x.title,x.email,_userName(x.email),x.method,x.channel].join(' ').toLowerCase()}));showReport('Distribuiri',`${shares.length} distribuiri totale`,rows);
+      } else if(key==='pending'){
+        const pending=materials.filter(m=>(m.status||'approved')==='pending');showReport('Materiale de aprobat',`${pending.length} materiale în așteptare`,pending.map(m=>({title:m.title||'Material',detail:`${normType(m.type)==='videoclip'?'Videoclip':'Procedură'} · ${_userName(m.createdBy)}`,when:dashboardTimestamp(m.createdAt),search:[m.title,m.type,m.createdBy,_userName(m.createdBy),...(m.categories||[]),...(m.equipment||[])].join(' ').toLowerCase()})));
+      } else if(key==='feedback'){
+        const rows=[...feedback].sort((a,b)=>_ts(b.updatedAt||b.createdAt)-_ts(a.updatedAt||a.createdAt)).map(x=>({title:x.title||'Material',detail:`${x.reaction==='up'?'Util':x.reaction==='down'?'Nu a fost util':'Fără reacție'} · ${_userName(x.email)}${x.storeName?` · ${x.storeName}`:''}${x.comment?` · ${x.comment}`:''}`,when:dashboardTimestamp(x.updatedAt||x.createdAt),search:[x.title,x.email,_userName(x.email),x.storeName,x.comment,x.reaction].join(' ').toLowerCase()}));showReport('Feedback utilizatori',`${feedback.length} feedback-uri primite`,rows);
+      }
+    }});
+  };
+  const input=document.getElementById('dashboardDetailsSearch');
+  if(input){const clone=input.cloneNode(true);input.replaceWith(clone);clone.addEventListener('input',()=>{const q=clone.value.trim().toLowerCase();renderReportRows(!q?reportRows:reportRows.filter(r=>(r.search||[r.title,r.detail,r.when].join(' ').toLowerCase()).includes(q)));});}
+  setTimeout(()=>{if(currentRole==='admin')setupDashboardInteractions();},0);
 })();

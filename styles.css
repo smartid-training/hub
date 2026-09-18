@@ -2354,3 +2354,36 @@ html,body,#app,.app-shell,main.content{background:#071126!important;color:#fff}
 .page select option{background:#0b1830!important;color:#fff!important}
 /* Keep intentional colored action buttons/badges; remove accidental white content surfaces. */
 #dashboardPage .dashboard-pro-card,#manageMaterialsPage .panel,#geoAdminPage .panel,#usersPage .panel,#storesPage .panel{box-shadow:0 18px 45px rgba(2,8,23,.22)!important}
+
+/* ===== RAPOARTE DASHBOARD TOP + DARK 18.09 v8 ===== */
+#dashboardDetailsModal .dashboard-details-modal,
+#dashboardDetailsModal .shares-modal-head,
+#dashboardDetailsModal .dashboard-details-body{
+  background:linear-gradient(180deg,#0d1e3a,#08152a)!important;
+  color:#fff!important;
+}
+#dashboardDetailsModal .shares-modal-head{padding:22px!important;border-radius:18px!important;border:1px solid rgba(148,163,184,.20)!important}
+#dashboardDetailsModal .dashboard-detail-row{
+  background:linear-gradient(135deg,rgba(18,39,72,.98),rgba(11,27,52,.98))!important;
+  border:1px solid rgba(148,163,184,.20)!important;
+  color:#fff!important;
+  box-shadow:0 8px 24px rgba(2,8,23,.16)!important;
+}
+#dashboardDetailsModal .dashboard-detail-main b{color:#fff!important;font-size:15px!important}
+#dashboardDetailsModal .dashboard-detail-main span,
+#dashboardDetailsModal .dashboard-detail-row small,
+#dashboardDetailsModal #dashboardDetailsSubtitle{color:#b8c2d9!important}
+#dashboardDetailsModal .dashboard-details-search{background:#07152c!important;color:#fff!important;border-color:rgba(139,92,246,.55)!important}
+#dashboardDetailsModal .dashboard-detail-rank{display:inline-flex;min-width:34px;height:34px;align-items:center;justify-content:center;border-radius:10px;background:rgba(124,58,237,.20);border:1px solid rgba(139,92,246,.35);font-weight:900;color:#c4b5fd;margin-right:12px}
+#dashboardDetailsModal .dashboard-detail-row{justify-content:flex-start!important}
+#dashboardDetailsModal .dashboard-detail-main{flex:1!important}
+#dashboardDetailsModal .dashboard-detail-row>small{text-align:right!important;margin-left:auto!important}
+
+
+/* RAPOARTE TOP DARK v8 */
+#dashboardDetailsModal .dashboard-details-modal,#dashboardDetailsModal .shares-modal-head,#dashboardDetailsModal .dashboard-details-body{background:linear-gradient(180deg,#0d1e3a,#08152a)!important;color:#fff!important}
+#dashboardDetailsModal .shares-modal-head{padding:22px!important;border-radius:18px!important;border:1px solid rgba(148,163,184,.20)!important}
+#dashboardDetailsModal .dashboard-detail-row{background:linear-gradient(135deg,rgba(18,39,72,.98),rgba(11,27,52,.98))!important;border:1px solid rgba(148,163,184,.20)!important;color:#fff!important;box-shadow:0 8px 24px rgba(2,8,23,.16)!important;justify-content:flex-start!important}
+#dashboardDetailsModal .dashboard-detail-main{flex:1!important}#dashboardDetailsModal .dashboard-detail-main b{color:#fff!important;font-size:15px!important}#dashboardDetailsModal .dashboard-detail-main span,#dashboardDetailsModal .dashboard-detail-row small,#dashboardDetailsModal #dashboardDetailsSubtitle{color:#b8c2d9!important}#dashboardDetailsModal .dashboard-detail-row>small{text-align:right!important;margin-left:auto!important}
+#dashboardDetailsModal .dashboard-details-search{background:#07152c!important;color:#fff!important;border-color:rgba(139,92,246,.55)!important}
+#dashboardDetailsModal .dashboard-detail-rank{display:inline-flex;min-width:34px;height:34px;align-items:center;justify-content:center;border-radius:10px;background:rgba(124,58,237,.20);border:1px solid rgba(139,92,246,.35);font-weight:900;color:#c4b5fd;margin-right:12px}
