@@ -1595,6 +1595,9 @@ el("searchInput").addEventListener("input", () => {
 document.querySelectorAll(".side-btn").forEach(button => {
   button.addEventListener("click", async () => {
     const page = button.dataset.page;
+    // Butoanele din sidebar fara data-page (ex. „Vezi ca utilizator”)
+    // nu navigheaza si nu inchid pagina curenta; au propriul lor handler.
+    if (!page) return;
     if (page === "dashboardPage") await loadDashboard();
     if (page === "equipmentPage") {
       if (currentRole === "admin" && !["carrefour","franciza","suport"].includes(currentCategory)) currentCategory = "carrefour";
