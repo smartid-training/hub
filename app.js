@@ -417,7 +417,7 @@ function renderPortalLandingForRole() {
     {
       category: "suport",
       title: "SUPORT INTERN",
-      logo: "smartid-logo-visual.jfif",
+      logo: "smartid-logo-user.png",
       visualClass: "support-card-intern"
     }
   ];
@@ -821,6 +821,21 @@ function startEditMaterial(materialId) {
   window.scrollTo({top:0, behavior:"smooth"});
 }
 
+function showSmartIDToast(message, type = "success") {
+  let toast = document.getElementById("smartidToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "smartidToast";
+    toast.className = "smartid-toast";
+    document.body.appendChild(toast);
+  }
+  toast.className = `smartid-toast ${type}`;
+  toast.textContent = message;
+  requestAnimationFrame(() => toast.classList.add("show"));
+  clearTimeout(window.__smartidToastTimer);
+  window.__smartidToastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+}
+
 async function renderAdminMaterials() {
   await loadMaterials();
   const container = el("adminMaterialsList");
@@ -865,6 +880,7 @@ async function renderAdminMaterials() {
       const material=materials.find(x=>x.id===button.dataset.approveMaterial);
       await updateDoc(doc(db,"videos",button.dataset.approveMaterial),{status:"approved",approvedBy:currentEmail,approvedAt:serverTimestamp()});
       await logTeamActivity("material_approved",material);
+      showSmartIDToast("Material aprobat și publicat.");
       await renderAdminMaterials(); await loadDashboard();
     });
   });

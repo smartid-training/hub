@@ -1898,3 +1898,67 @@ table tbody,tbody tr,tbody td{background:#fff!important;color:var(--text)!import
   .search-wrap{order:2;width:100%!important;min-width:0!important}
   .logout{order:1;margin-left:auto!important}
 }
+
+/* 25.09 - Gestionare materiale compact + search icon */
+#manageMaterialsPage .panel{padding:18px 20px!important;max-width:1180px!important;margin-right:auto!important}
+#manageMaterialsPage .store-toolbar{grid-template-columns:minmax(320px,1fr) 180px!important;gap:12px!important;margin-bottom:10px!important}
+#manageMaterialsPage .admin-material-row{padding:11px 0!important;max-width:1120px!important}
+#manageMaterialsPage .admin-material-row b{font-size:16px!important}
+#manageMaterialsPage .store-meta,#manageMaterialsPage .material-tags,#manageMaterialsPage .material-info{font-size:12px!important;margin-top:4px!important}
+#manageMaterialsPage .row-actions{margin-top:7px!important;gap:7px!important}
+#manageMaterialsPage .row-actions button{padding:8px 12px!important;min-height:36px!important}
+#manageMaterialsPage .approval-line{display:none!important}
+.search-wrap span{font-size:25px!important;font-weight:900!important;line-height:1!important;left:15px!important}
+.search-wrap input,.search{padding-left:49px!important}
+.smartid-toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-18px);z-index:99999;min-width:260px;max-width:min(520px,calc(100vw - 32px));padding:13px 18px;border-radius:14px;background:#06171A;color:#fff;border:1px solid #35B89A;box-shadow:0 16px 40px rgba(6,23,26,.24);font-weight:800;text-align:center;opacity:0;pointer-events:none;transition:.22s ease}
+.smartid-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.smartid-toast.success::before{content:'✓';display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-right:9px;border-radius:50%;background:#35B89A;color:#06171A}
+@media(max-width:760px){#manageMaterialsPage .store-toolbar{grid-template-columns:1fr!important}#manageMaterialsPage .panel{padding:14px!important}}
+
+/* === GLOBAL USER LAYOUT + PALETA UNICA 25.09.2026 === */
+/* Aceleasi culori si acelasi layout pentru Carrefour, Franciza si Suport */
+body:not(.admin-mode) .support-zone-card{
+  border:1px solid rgba(53,184,154,.45)!important;
+  background:linear-gradient(115deg,#06171A,#074F4B 58%,#06171A)!important;
+}
+body:not(.admin-mode) .support-zone-visual{
+  background:radial-gradient(circle,rgba(53,184,154,.20),transparent 66%)!important;
+}
+body:not(.admin-mode) .support-zone-visual::after{
+  background:#35B89A!important;
+  box-shadow:0 0 35px #35B89A!important;
+}
+body:not(.admin-mode) .support-zone-glow{background:#35B89A!important}
+body:not(.admin-mode) .support-zone-title h3{color:#35B89A!important}
+body:not(.admin-mode) .support-type-row,
+body:not(.admin-mode) .support-equipment-row{
+  border-color:rgba(53,184,154,.18)!important;
+  background:rgba(255,255,255,.07)!important;
+  color:#fff!important;
+}
+body:not(.admin-mode) .support-type-row:hover,
+body:not(.admin-mode) .support-equipment-row:hover{background:rgba(53,184,154,.13)!important}
+body:not(.admin-mode) .support-type-name,
+body:not(.admin-mode) .support-equipment-name{color:#fff!important}
+body:not(.admin-mode) .support-type-total{background:#E6F3F6!important;color:#06171A!important}
+body:not(.admin-mode) .type-video,
+body:not(.admin-mode) .type-procedure,
+body:not(.admin-mode) .support-equipment-icon{background:#074F4B!important;color:#fff!important}
+/* Toate siglele au exact aceeasi zona vizuala */
+body:not(.admin-mode) .support-zone-visual img{
+  width:min(82%,260px)!important;
+  height:170px!important;
+  object-fit:contain!important;
+  border-radius:0!important;
+}
+body:not(.admin-mode) .support-card-intern .support-zone-visual img{
+  width:min(82%,260px)!important;
+  height:170px!important;
+  object-fit:contain!important;
+  border-radius:0!important;
+}
+@media(max-width:760px){
+  body:not(.admin-mode) .support-zone-card{grid-template-columns:1fr!important}
+  body:not(.admin-mode) .support-zone-visual{min-height:185px!important}
+  body:not(.admin-mode) .support-zone-visual img{height:135px!important}
+}
