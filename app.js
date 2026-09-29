@@ -1646,3 +1646,30 @@ onAuthStateChanged(auth, async user => {
     el("loginError").textContent = error.message || "Autentifică-te din nou.";
   }
 });
+
+// Dashboard v7: cards are the controls; details/export live inside the popup.
+function initCompactDashboardClicks(){
+  document.querySelectorAll('.dashboard-pro-card').forEach(card=>{
+    if(card.dataset.compactBound) return; card.dataset.compactBound='1';
+    const detail=card.querySelector('[data-stat-details]');
+    const type=card.classList.contains('card-logins')?'logins':card.classList.contains('card-stores')?'stores':card.classList.contains('card-videos')?'videos':card.classList.contains('card-procedures')?'procedures':'shares';
+    card.setAttribute('role','button'); card.setAttribute('tabindex','0');
+    const open=()=>{ const hidden=document.querySelector(`[data-stat-details="${type}"]`); if(hidden) hidden.click(); };
+    card.addEventListener('click',open); card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
+  });
+  const team=document.getElementById('teamActivityCard');
+  if(team && !team.dataset.compactBound){ team.dataset.compactBound='1';
+    const openTeam=()=>{
+      const acts=[...(dashboardDetailCache.teamActivity||[])].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt));
+      const label=a=>({material_added:'Adăugare',material_edited:'Editare',material_approved:'Aprobare',material_rejected:'Respingere',material_deleted:'Ștergere'}[a]||a||'Activitate');
+      openDashboardDetails('Activitate echipă','Istoricul complet al activității colegilor.',acts.map(a=>({title:displayUser(a.email),detail:`${label(a.action)} · ${a.title||'Material'}${a.type?' · '+a.type:''}`,when:dashboardTimestamp(a.createdAt)})));
+      setTimeout(()=>{
+        const body=document.getElementById('dashboardDetailsBody'); if(!body||document.getElementById('teamModalExport')) return;
+        const b=document.createElement('button'); b.id='teamModalExport'; b.className='secondary'; b.textContent='Export Excel'; b.style.marginBottom='12px';
+        b.onclick=e=>{e.stopPropagation();document.getElementById('exportTeamExcel')?.click();}; body.prepend(b);
+      },0);
+    };
+    team.addEventListener('click',openTeam); team.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTeam();}});
+  }
+}
+setInterval(initCompactDashboardClicks,700);

@@ -85,7 +85,7 @@
               <p>Arată de câte ori s-au autentificat utilizatorii în SmartID Portal.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <div class="metric-actions"><button class="metric-details" data-stat-details="logins">Vezi detalii ›</button><button class="metric-export" data-stat-export="logins">Export Excel</button></div>
+            
           </article>
 
           <article class="dashboard-pro-card card-stores">
@@ -96,7 +96,7 @@
               <p>Află câte magazine distincte au accesat portalul.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <div class="metric-actions"><button class="metric-details" data-stat-details="stores">Vezi detalii ›</button><button class="metric-export" data-stat-export="stores">Export Excel</button></div>
+            
           </article>
 
           <article class="dashboard-pro-card card-videos">
@@ -107,7 +107,7 @@
               <p id="topVideoPreview">Cele mai vizionate videoclipuri din portal.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <div class="metric-actions"><button class="metric-details" data-stat-details="videos">Vezi Top 5 ›</button><button class="metric-export" data-stat-export="videos">Export Excel</button></div>
+            
           </article>
 
           <article class="dashboard-pro-card card-procedures">
@@ -118,7 +118,7 @@
               <p>Arată numărul total de accesări ale procedurilor.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <div class="metric-actions"><button class="metric-details" data-stat-details="procedures">Vezi detalii ›</button><button class="metric-export" data-stat-export="procedures">Export Excel</button></div>
+            
           </article>
 
           <article class="dashboard-pro-card card-shares">
@@ -129,34 +129,25 @@
               <p>Arată de câte ori au fost distribuite materialele din portal.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
-            <div class="metric-actions"><button class="metric-details" data-stat-details="shares">Vezi detalii ›</button><button class="metric-export" data-stat-export="shares">Export Excel</button></div>
+            
           </article>
 
 
         </div>
 
-        <section class="panel team-panel dashboard-team-pro">
-          <div class="panel-head">
+        <section class="panel team-panel dashboard-team-pro" id="teamActivityCard" role="button" tabindex="0">
+          <div class="team-compact-main">
+            <div class="team-compact-icon">↗</div>
             <div>
               <h2>Activitate echipă</h2>
-              <p class="subtitle">Activitatea fiecărui coleg: ce a făcut, de câte ori și când.</p>
+              <p class="subtitle">Vezi activitatea colegilor, acțiunile și istoricul complet.</p>
             </div>
           </div>
-
-          <div class="team-summary">
-            <div class="team-summary-card">
-              <span>Videoclipuri încărcate</span>
-              <strong id="teamVideosTotal">0</strong>
-            </div>
-            <div class="team-summary-card">
-              <span>Proceduri încărcate</span>
-              <strong id="teamProceduresTotal">0</strong>
-            </div>
+          <div class="team-compact-open">Vezi activitatea ›</div>
+          <div class="team-hidden-data" aria-hidden="true">
+            <span id="teamVideosTotal">0</span><span id="teamProceduresTotal">0</span>
+            <div id="teamCharts"></div><div id="contributorsList"></div><button id="exportTeamExcel">Export Excel</button>
           </div>
-
-          <div id="teamCharts" class="team-charts"></div>
-          <div class="team-export-row"><button id="exportTeamExcel" class="secondary">Export Excel</button></div>
-          <div id="contributorsList" class="contributors-list"></div>
         </section>
       </section>
 
