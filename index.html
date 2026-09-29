@@ -39,15 +39,16 @@
     <header class="topbar">
       <div class="brand-row">
         <button id="menuBtn" class="menu-btn hidden" aria-label="Meniu">☰</button>
-        <img src="smartid-logo-user.png" alt="Smart ID" class="topbar-smartid-logo">
-        <strong class="brand">SmartID Portal</strong>
+        <div class="smartid-wordmark" aria-label="Smart ID"><span>smart</span><b>ID</b></div>
+        <strong class="brand">Portal</strong>
       </div>
       <div class="top-actions">
         <div class="search-wrap">
-          <span>⌕</span>
+          <span class="search-icon">⌕</span>
           <input id="searchInput" class="search" placeholder="Caută după titlu, descriere sau tag...">
         </div>
         <div id="userRoleBadge" class="user-role-badge hidden"></div>
+        <button id="approvalNotifyBtn" class="approval-notify hidden" type="button" title="Materiale de aprobat">✓ <b id="approvalNotifyCount">0</b></button>
         <button id="logoutBtn" class="logout">Logout</button>
       </div>
     </header>
@@ -72,9 +73,7 @@
             <h1>Dashboard</h1>
             <p>Activitatea SmartID Portal</p>
           </div>
-          <div class="dashboard-pro-badges">
-            <span class="status-chip"><i></i> Portal activ</span>
-          </div>
+
         </div>
 
         <div class="dashboard-pro-list">
@@ -133,23 +132,14 @@
             <button class="metric-details" data-stat-details="shares">Vezi distribuirile ›</button>
           </article>
 
-          <article class="dashboard-pro-card card-pending">
-            <div class="metric-icon">✓</div>
-            <div class="metric-copy">
-              <strong id="statPending">0</strong>
-              <h3>De aprobat</h3>
-              <p>Materiale încărcate de colegi care așteaptă aprobarea Adminului principal.</p>
-            </div>
-            <div class="metric-line" aria-hidden="true"></div>
-            <button class="metric-details" data-stat-details="pending">Deschide de aprobat ›</button>
-          </article>
+
         </div>
 
         <section class="panel team-panel dashboard-team-pro">
           <div class="panel-head">
             <div>
               <h2>Activitate echipă</h2>
-              <p class="subtitle">Materialele încărcate de fiecare coleg.</p>
+              <p class="subtitle">Activitatea fiecărui coleg: ce a făcut, de câte ori și când.</p>
             </div>
           </div>
 
@@ -164,6 +154,8 @@
             </div>
           </div>
 
+          <div id="teamCharts" class="team-charts"></div>
+          <div class="team-export-row"><button id="exportTeamExcel" class="secondary">Export Excel</button></div>
           <div id="contributorsList" class="contributors-list"></div>
         </section>
       </section>

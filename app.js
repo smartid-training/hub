@@ -924,7 +924,7 @@ function openDashboardDetails(title, subtitle, rows) {
 
 
 
-let dashboardDetailCache = { sessions: [], views: [], shares: [] };
+let dashboardDetailCache = { sessions: [], views: [], shares: [], teamActivity: [] };
 
 function setupDashboardInteractions() {
   document.querySelectorAll("[data-stat-details]").forEach(button => {
@@ -1021,6 +1021,10 @@ function setupDashboardInteractions() {
       }
     };
   });
+  if (el("approvalNotifyBtn")) el("approvalNotifyBtn").onclick = () => {
+    const pending = materials.filter(m => (m.status || "approved") === "pending");
+    openDashboardDetails("Materiale de aprobat","Materialele încărcate de echipă care așteaptă aprobarea Adminului principal.",pending.map(m=>({title:m.title||"Material",detail:`${normType(m.type)==="videoclip"?"Videoclip":"Procedură"} · ${displayUser(m.createdBy)}`,when:dashboardTimestamp(m.createdAt)})));
+  };
 }
 
 async function loadDashboard() {
@@ -1028,10 +1032,11 @@ async function loadDashboard() {
     await loadUserNameMap();
     await loadMaterials();
 
-    const [sessionsSnap, viewsSnap, sharesSnap] = await Promise.all([
+    const [sessionsSnap, viewsSnap, sharesSnap, teamActivitySnap] = await Promise.all([
       getDocs(collection(db, "sessions")),
       getDocs(collection(db, "materialViews")),
-      getDocs(collection(db, "shares"))
+      getDocs(collection(db, "shares")),
+      getDocs(collection(db, "teamActivity"))
     ]);
 
     const sessions = sessionsSnap.docs
@@ -1046,7 +1051,8 @@ async function loadDashboard() {
       .map(item => ({ id: item.id, ...item.data() }))
       .filter(item => valueToMillis(item.createdAt) >= DASHBOARD_RESET_AT);
 
-    dashboardDetailCache = { sessions, views, shares };
+    const teamActivity = teamActivitySnap.docs.map(item => ({ id:item.id, ...item.data() })).filter(item => valueToMillis(item.createdAt) >= DASHBOARD_RESET_AT);
+    dashboardDetailCache = { sessions, views, shares, teamActivity };
 
     const videoViews = views.filter(item => normType(item.type) === "videoclip").length;
     const procedureViews = views.filter(item => normType(item.type) === "procedura").length;
@@ -1058,9 +1064,10 @@ async function loadDashboard() {
     el("statProcedures").textContent = procedureViews;
     el("statShares").textContent = shares.length;
 
-    if (el("statPending")) {
-      el("statPending").textContent = materials.filter(m => (m.status || "approved") === "pending").length;
-    }
+    const pendingCount = materials.filter(m => (m.status || "approved") === "pending").length;
+    if (el("statPending")) el("statPending").textContent = pendingCount;
+    if (el("approvalNotifyCount")) el("approvalNotifyCount").textContent = pendingCount;
+    if (el("approvalNotifyBtn")) el("approvalNotifyBtn").classList.toggle("hidden", !isPrimaryAdmin());
 
     const totalViews = videoViews + procedureViews;
     const videoAngle = totalViews ? (videoViews / totalViews) * 360 : 0;
@@ -1113,6 +1120,26 @@ async function loadDashboard() {
           </div>
         `).join("")
       : '<div class="empty">Nu există încă activitate nouă a echipei.</div>';
+
+    const actionLabel = action => ({material_added:"Adăugare",material_edited:"Editare",material_approved:"Aprobare",material_rejected:"Respingere",material_deleted:"Ștergere"}[action] || action || "Activitate");
+    const activityByUser = {};
+    teamActivity.forEach(a => { const e=String(a.email||""); if(!e) return; (activityByUser[e] ??= []).push(a); });
+    const chartUsers = [...new Set([...Object.keys(byUser), ...Object.keys(activityByUser)])];
+    const maxActs = Math.max(1, ...chartUsers.map(e => (activityByUser[e]||[]).length));
+    if (el("teamCharts")) el("teamCharts").innerHTML = chartUsers.length ? chartUsers.map(email => {
+      const acts=(activityByUser[email]||[]).sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt));
+      const adds=acts.filter(a=>a.action==="material_added").length, edits=acts.filter(a=>a.action==="material_edited").length;
+      return `<div class="team-chart-card"><div class="team-chart-head"><b>${escapeHtml(displayUser(email))}</b><span>${acts.length} acțiuni</span></div><div class="team-bar-row"><span>Total acțiuni</span><div class="team-bar"><i style="width:${Math.max(4,(acts.length/maxActs)*100)}%"></i></div><b>${acts.length}</b></div><div class="team-bar-row"><span>Adăugări</span><div class="team-bar"><i style="width:${acts.length?Math.max(4,(adds/acts.length)*100):0}%"></i></div><b>${adds}</b></div><div class="team-bar-row"><span>Editări</span><div class="team-bar"><i style="width:${acts.length?Math.max(4,(edits/acts.length)*100):0}%"></i></div><b>${edits}</b></div><div class="team-event-list">${acts.slice(0,4).map(a=>`<div><b>${escapeHtml(actionLabel(a.action))}</b> · ${escapeHtml(a.title||"Material")} · ${escapeHtml(dashboardTimestamp(a.createdAt))}</div>`).join("") || "Fără acțiuni înregistrate."}</div></div>`;
+    }).join("") : '<div class="empty">Nu există încă activitate înregistrată.</div>';
+
+    const exportBtn=el("exportTeamExcel");
+    if(exportBtn) exportBtn.onclick=()=>{
+      const rows=[["Utilizator","Acțiune","Material","Tip","Data/Ora"]];
+      [...teamActivity].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt)).forEach(a=>rows.push([displayUser(a.email),actionLabel(a.action),a.title||"",a.type||"",dashboardTimestamp(a.createdAt)]));
+      const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      const html=`<html><head><meta charset="UTF-8"></head><body><table>${rows.map((r,i)=>`<tr>${r.map(c=>`<${i?"td":"th"}>${esc(c)}</${i?"td":"th"}>`).join("")}</tr>`).join("")}</table></body></html>`;
+      const blob=new Blob([html],{type:"application/vnd.ms-excel;charset=utf-8"}); const u=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=u; a.download="Activitate_echipa_SmartID.xls"; a.click(); setTimeout(()=>URL.revokeObjectURL(u),500);
+    };
 
     document.querySelectorAll(".team-member-row").forEach(row => {
       row.onclick = () => {
