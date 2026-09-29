@@ -1701,9 +1701,11 @@ function toggleV8Stat(type,card){
 function renderV8Team(){
  const box=document.getElementById('teamInlineDetails'); if(!box)return;
  const acts=[...(dashboardDetailCache.teamActivity||[])].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt));
- const map=new Map();acts.forEach(a=>{const e=a.email||'Necunoscut',v=map.get(e)||{total:0,adds:0,edits:0,last:null};v.total++;if(a.action==='material_added')v.adds++;if(a.action==='material_edited')v.edits++;if(!v.last||valueToMillis(a.createdAt)>valueToMillis(v.last))v.last=a.createdAt;map.set(e,v)});
+ const map=new Map();acts.forEach(a=>{const e=a.email||'Necunoscut',v=map.get(e)||{total:0,adds:0,edits:0,approvals:0,last:null};v.total++;if(a.action==='material_added')v.adds++;if(a.action==='material_edited')v.edits++;if(a.action==='material_approved')v.approvals++;if(!v.last||valueToMillis(a.createdAt)>valueToMillis(v.last))v.last=a.createdAt;map.set(e,v)});
  const rows=[...map.entries()].sort((a,b)=>b[1].total-a[1].total);
- box.innerHTML=`<div class="team-table-head"><span>Coleg</span><span>Acțiuni</span><span>Adăugări</span><span>Editări</span><span>Ultima activitate</span></div>${rows.length?rows.map(([e,v])=>`<div class="team-table-row"><b>${escapeHtml(displayUser(e))}</b><span>${v.total}</span><span>${v.adds}</span><span>${v.edits}</span><span>${escapeHtml(dashboardTimestamp(v.last))}</span></div>`).join(''):'<div class="empty">Nu există încă activitate.</div>'}<div class="team-inline-footer"><button class="inline-text-action" id="v8TeamExport">Export Excel ↗</button></div>`;
+ box.innerHTML=`<div class="team-summary-head"><div><b>Activitate pe colegi</b><span>Apasă pe un coleg pentru istoricul complet.</span></div><button class="inline-text-action" id="v8TeamExport">Export Excel ↗</button></div><div class="team-table-head"><span>Coleg</span><span>Total</span><span>Adăugări</span><span>Editări</span><span>Aprobări</span><span>Ultima activitate</span><span></span></div>${rows.length?rows.map(([e,v],i)=>`<div class="team-table-row team-user-summary" data-team-index="${i}"><b>${escapeHtml(displayUser(e))}</b><span>${v.total}</span><span>${v.adds}</span><span>${v.edits}</span><span>${v.approvals}</span><span>${escapeHtml(dashboardTimestamp(v.last))}</span><span class="team-row-chevron">⌄</span></div><div class="team-user-history hidden" id="teamHistory${i}"></div>`).join(''):'<div class="empty">Nu există încă activitate.</div>'}`;
+ const entries=rows;
+ box.querySelectorAll('.team-user-summary').forEach(row=>row.onclick=e=>{e.stopPropagation();const i=Number(row.dataset.teamIndex), email=entries[i][0], hist=document.getElementById('teamHistory'+i), open=hist.classList.contains('hidden');box.querySelectorAll('.team-user-history').forEach(x=>x.classList.add('hidden'));box.querySelectorAll('.team-user-summary').forEach(x=>x.classList.remove('open'));if(open){const own=acts.filter(a=>(a.email||'Necunoscut')===email);hist.innerHTML=own.map(a=>`<div class="team-history-row"><b>${escapeHtml(v8ActionLabel(a.action))}</b><span>${escapeHtml(a.title||'Material')}${a.type?' · '+escapeHtml(a.type):''}</span><small>${escapeHtml(dashboardTimestamp(a.createdAt))}</small></div>`).join('');hist.classList.remove('hidden');row.classList.add('open')}});
  document.getElementById('v8TeamExport').onclick=e=>{e.stopPropagation();exportDashboardExcel('Activitate_echipa_SmartID.xls',['Utilizator','Acțiune','Material','Tip','Data/Ora'],acts.map(a=>[displayUser(a.email),v8ActionLabel(a.action),a.title||'',a.type||'',dashboardTimestamp(a.createdAt)]));};
 }
 function initV8Dashboard(){
@@ -1712,4 +1714,18 @@ function initV8Dashboard(){
  const team=document.getElementById('teamActivityCard');if(team&&!team.dataset.v8Bound){team.dataset.v8Bound='1';team.dataset.compactBound='1';const h=e=>{e.stopImmediatePropagation();e.preventDefault();const box=document.getElementById('teamInlineDetails');const open=box.classList.contains('hidden');if(open){renderV8Team();box.classList.remove('hidden');team.classList.add('expanded')}else{box.classList.add('hidden');team.classList.remove('expanded')}};team.addEventListener('click',h,true);team.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){h(e)}},true)}
 }
 setInterval(initV8Dashboard,650);
-\n\n// v9: collapsible equipment groups on Add Material\ndocument.addEventListener('click', function(e){\n  const btn=e.target.closest('.equipment-section-toggle');\n  if(!btn) return;\n  const section=btn.closest('.compact-equipment-section');\n  const body=section && section.querySelector('.equipment-options');\n  if(!body) return;\n  const open=btn.getAttribute('aria-expanded')==='true';\n  btn.setAttribute('aria-expanded', String(!open));\n  body.classList.toggle('is-collapsed', open);\n  const ch=btn.querySelector('.equipment-chevron');\n  if(ch) ch.textContent=open?'⌄':'⌃';\n});\n
+
+
+// v9: collapsible equipment groups on Add Material
+document.addEventListener('click', function(e){
+  const btn=e.target.closest('.equipment-section-toggle');
+  if(!btn) return;
+  const section=btn.closest('.compact-equipment-section');
+  const body=section && section.querySelector('.equipment-options');
+  if(!body) return;
+  const open=btn.getAttribute('aria-expanded')==='true';
+  btn.setAttribute('aria-expanded', String(!open));
+  body.classList.toggle('is-collapsed', open);
+  const ch=btn.querySelector('.equipment-chevron');
+  if(ch) ch.textContent=open?'⌄':'⌃';
+});
