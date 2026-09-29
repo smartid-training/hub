@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SmartID Portal</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="smartid-favicon.png?v=6">
+  <link rel="icon" type="image/png" sizes="32x32" href="smartid-favicon.png?v=9">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=dashboard-pro-v6">
+  <link rel="stylesheet" href="styles.css?v=portal-pro-v9">
 </head>
 <body>
   <main id="loginPage" class="login-page">
@@ -135,6 +135,13 @@
 
         </div>
 
+        <section id="topFiveInline" class="dashboard-inline-section top-five-inline">
+          <div class="inline-section-head"><div><span class="eyebrow">TOP 5</span><h2>Cele mai vizionate videoclipuri</h2></div><button class="inline-text-action" id="exportTop5Inline" type="button">Export Excel ↗</button></div>
+          <div id="topFiveInlineList" class="top-five-list"><div class="empty">Se încarcă...</div></div>
+        </section>
+
+        <div id="statInlineDetails" class="dashboard-inline-section stat-inline-details hidden"></div>
+
         <section class="panel team-panel dashboard-team-pro" id="teamActivityCard" role="button" tabindex="0">
           <div class="team-compact-main">
             <div class="team-compact-icon">↗</div>
@@ -143,12 +150,13 @@
               <p class="subtitle">Vezi activitatea colegilor, acțiunile și istoricul complet.</p>
             </div>
           </div>
-          <div class="team-compact-open">Vezi activitatea ›</div>
+          <div class="team-compact-open">Extinde <span>⌄</span></div>
           <div class="team-hidden-data" aria-hidden="true">
             <span id="teamVideosTotal">0</span><span id="teamProceduresTotal">0</span>
             <div id="teamCharts"></div><div id="contributorsList"></div><button id="exportTeamExcel">Export Excel</button>
           </div>
         </section>
+        <section id="teamInlineDetails" class="dashboard-inline-section team-inline-details hidden"></section>
       </section>
 
 
@@ -222,17 +230,17 @@
             <label><input type="checkbox" name="materialCategory" value="suport"> Suport</label>
           </div>
 
-          <div class="equipment-select-block">
-            <h3>Echipamente Carrefour</h3>
-            <div id="carrefourEquipmentChoices" class="checkbox-grid"></div>
+          <div class="equipment-select-block compact-equipment-section">
+            <button class="equipment-section-toggle" type="button" aria-expanded="true"><span>Echipamente Carrefour</span><span class="equipment-toggle-line"></span><span class="equipment-chevron">⌃</span></button>
+            <div id="carrefourEquipmentChoices" class="checkbox-grid equipment-options"></div>
           </div>
-          <div class="equipment-select-block">
-            <h3>Echipamente Franciză</h3>
-            <div id="francizaEquipmentChoices" class="checkbox-grid"></div>
+          <div class="equipment-select-block compact-equipment-section">
+            <button class="equipment-section-toggle" type="button" aria-expanded="false"><span>Echipamente Franciză</span><span class="equipment-toggle-line"></span><span class="equipment-chevron">⌄</span></button>
+            <div id="francizaEquipmentChoices" class="checkbox-grid equipment-options is-collapsed"></div>
           </div>
-          <div class="equipment-select-block">
-            <h3>Echipamente Suport</h3>
-            <div id="suportEquipmentChoices" class="checkbox-grid"></div>
+          <div class="equipment-select-block compact-equipment-section">
+            <button class="equipment-section-toggle" type="button" aria-expanded="false"><span>Echipamente Suport</span><span class="equipment-toggle-line"></span><span class="equipment-chevron">⌄</span></button>
+            <div id="suportEquipmentChoices" class="checkbox-grid equipment-options is-collapsed"></div>
           </div>
 
           <div class="material-form-actions">

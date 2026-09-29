@@ -1673,3 +1673,43 @@ function initCompactDashboardClicks(){
   }
 }
 setInterval(initCompactDashboardClicks,700);
+
+// Dashboard v8: detaliile se extind în pagină; Top 5 rămâne permanent vizibil.
+function v8ActionLabel(action){return ({material_added:'Adăugare',material_edited:'Editare',material_approved:'Aprobare',material_rejected:'Respingere',material_deleted:'Ștergere'}[action]||action||'Activitate');}
+function renderV8TopFive(){
+  const list=document.getElementById('topFiveInlineList'); if(!list)return;
+  const top=topVideoStats(dashboardDetailCache.views||[]);
+  list.innerHTML=top.length?top.map((x,i)=>`<div class="top-five-item"><div class="top-five-rank">#${i+1}</div><div class="top-five-title" title="${escapeHtml(x.title)}">${escapeHtml(x.title)}</div><div class="top-five-meta">${x.count} vizualizări · ${x.users.size} utilizatori</div></div>`).join(''):'<div class="empty">Nu există încă vizualizări.</div>';
+  const b=document.getElementById('exportTop5Inline'); if(b)b.onclick=e=>{e.stopPropagation();exportDashboardExcel('Top_5_videoclipuri_SmartID.xls',['Loc','Videoclip','Vizualizări','Utilizatori','Magazine','Ultima vizualizare'],top.map((x,i)=>[i+1,x.title,x.count,x.users.size,x.stores.size,dashboardTimestamp(x.last)]));};
+}
+function v8Rows(type){
+ const {sessions,views,shares}=dashboardDetailCache;
+ if(type==='logins')return [...sessions].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt)).map(x=>({t:displayUser(x.email),d:x.storeName?`${x.storeName}${x.storeId?` · ID ${x.storeId}`:''}`:(x.role||''),w:dashboardTimestamp(x.createdAt)}));
+ if(type==='stores'){const m=new Map();sessions.forEach(x=>{if(!x.storeId&&!x.storeName)return;const k=x.storeId||x.storeName,v=m.get(k)||{name:x.storeName||'Magazin',id:x.storeId||'',count:0,last:x.createdAt};v.count++;if(valueToMillis(x.createdAt)>valueToMillis(v.last))v.last=x.createdAt;m.set(k,v)});return [...m.values()].sort((a,b)=>b.count-a.count).map(x=>({t:`${x.name}${x.id?` · ID ${x.id}`:''}`,d:`${x.count} autentificări`,w:`Ultima: ${dashboardTimestamp(x.last)}`}));}
+ if(type==='videos')return topVideoStats(views).map((x,i)=>({t:`${i+1}. ${x.title}`,d:`${x.count} vizualizări · ${x.users.size} utilizatori${x.stores.size?` · ${x.stores.size} magazine`:''}`,w:`Ultima: ${dashboardTimestamp(x.last)}`}));
+ if(type==='procedures')return [...views].filter(x=>normType(x.type)==='procedura').sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt)).map(x=>({t:x.title||'Procedură',d:`${displayUser(x.email)}${x.storeName?` · ${x.storeName}`:''}`,w:dashboardTimestamp(x.createdAt)}));
+ return [...shares].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt)).map(x=>({t:x.title||'Material',d:`${displayUser(x.email)} · ${x.method||x.channel||'Distribuire'}`,w:dashboardTimestamp(x.createdAt)}));
+}
+function toggleV8Stat(type,card){
+ const box=document.getElementById('statInlineDetails'), rows=v8Rows(type); if(!box)return;
+ if(box.dataset.open===type&&!box.classList.contains('hidden')){box.classList.add('hidden');box.dataset.open='';return;}
+ const titles={logins:'Autentificări',stores:'Magazine active',videos:'Top 5 videoclipuri',procedures:'Vizualizări proceduri',shares:'Distribuiri'};
+ box.dataset.open=type;box.classList.remove('hidden');box.innerHTML=`<div class="stat-inline-head"><h2>${titles[type]}</h2><button class="inline-text-action" id="v8ExportStat">Export Excel ↗</button></div><div class="stat-inline-list">${rows.length?rows.map(r=>`<div class="stat-inline-row"><b>${escapeHtml(r.t)}</b><span>${escapeHtml(r.d)}</span><small>${escapeHtml(r.w)}</small></div>`).join(''):'<div class="empty">Nu există încă informații.</div>'}</div>`;
+ document.getElementById('v8ExportStat').onclick=e=>{e.stopPropagation();exportDashboardExcel(`${titles[type].replace(/\s+/g,'_')}_SmartID.xls`,['Element','Detalii','Data/Ora'],rows.map(r=>[r.t,r.d,r.w]));};
+ box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function renderV8Team(){
+ const box=document.getElementById('teamInlineDetails'); if(!box)return;
+ const acts=[...(dashboardDetailCache.teamActivity||[])].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt));
+ const map=new Map();acts.forEach(a=>{const e=a.email||'Necunoscut',v=map.get(e)||{total:0,adds:0,edits:0,last:null};v.total++;if(a.action==='material_added')v.adds++;if(a.action==='material_edited')v.edits++;if(!v.last||valueToMillis(a.createdAt)>valueToMillis(v.last))v.last=a.createdAt;map.set(e,v)});
+ const rows=[...map.entries()].sort((a,b)=>b[1].total-a[1].total);
+ box.innerHTML=`<div class="team-table-head"><span>Coleg</span><span>Acțiuni</span><span>Adăugări</span><span>Editări</span><span>Ultima activitate</span></div>${rows.length?rows.map(([e,v])=>`<div class="team-table-row"><b>${escapeHtml(displayUser(e))}</b><span>${v.total}</span><span>${v.adds}</span><span>${v.edits}</span><span>${escapeHtml(dashboardTimestamp(v.last))}</span></div>`).join(''):'<div class="empty">Nu există încă activitate.</div>'}<div class="team-inline-footer"><button class="inline-text-action" id="v8TeamExport">Export Excel ↗</button></div>`;
+ document.getElementById('v8TeamExport').onclick=e=>{e.stopPropagation();exportDashboardExcel('Activitate_echipa_SmartID.xls',['Utilizator','Acțiune','Material','Tip','Data/Ora'],acts.map(a=>[displayUser(a.email),v8ActionLabel(a.action),a.title||'',a.type||'',dashboardTimestamp(a.createdAt)]));};
+}
+function initV8Dashboard(){
+ renderV8TopFive();
+ document.querySelectorAll('.dashboard-pro-card').forEach(card=>{if(card.dataset.v8Bound)return;card.dataset.v8Bound='1';card.dataset.compactBound='1';const type=card.classList.contains('card-logins')?'logins':card.classList.contains('card-stores')?'stores':card.classList.contains('card-videos')?'videos':card.classList.contains('card-procedures')?'procedures':'shares';const handler=e=>{e.stopImmediatePropagation();e.preventDefault();toggleV8Stat(type,card)};card.addEventListener('click',handler,true);card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){handler(e)}},true)});
+ const team=document.getElementById('teamActivityCard');if(team&&!team.dataset.v8Bound){team.dataset.v8Bound='1';team.dataset.compactBound='1';const h=e=>{e.stopImmediatePropagation();e.preventDefault();const box=document.getElementById('teamInlineDetails');const open=box.classList.contains('hidden');if(open){renderV8Team();box.classList.remove('hidden');team.classList.add('expanded')}else{box.classList.add('hidden');team.classList.remove('expanded')}};team.addEventListener('click',h,true);team.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){h(e)}},true)}
+}
+setInterval(initV8Dashboard,650);
+\n\n// v9: collapsible equipment groups on Add Material\ndocument.addEventListener('click', function(e){\n  const btn=e.target.closest('.equipment-section-toggle');\n  if(!btn) return;\n  const section=btn.closest('.compact-equipment-section');\n  const body=section && section.querySelector('.equipment-options');\n  if(!body) return;\n  const open=btn.getAttribute('aria-expanded')==='true';\n  btn.setAttribute('aria-expanded', String(!open));\n  body.classList.toggle('is-collapsed', open);\n  const ch=btn.querySelector('.equipment-chevron');\n  if(ch) ch.textContent=open?'⌄':'⌃';\n});\n
