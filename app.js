@@ -926,6 +926,24 @@ function openDashboardDetails(title, subtitle, rows) {
 
 let dashboardDetailCache = { sessions: [], views: [], shares: [], teamActivity: [] };
 
+function exportDashboardExcel(filename, headers, rows) {
+  const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const all=[headers,...rows];
+  const html=`<html><head><meta charset="UTF-8"></head><body><table>${all.map((r,i)=>`<tr>${r.map(c=>`<${i?"td":"th"}>${esc(c)}</${i?"td":"th"}>`).join("")}</tr>`).join("")}</table></body></html>`;
+  const blob=new Blob([html],{type:"application/vnd.ms-excel;charset=utf-8"});
+  const u=URL.createObjectURL(blob), a=document.createElement("a"); a.href=u; a.download=filename; a.click(); setTimeout(()=>URL.revokeObjectURL(u),500);
+}
+function topVideoStats(views) {
+  const map=new Map();
+  views.filter(x=>normType(x.type)==="videoclip").forEach(x=>{
+    const key=String(x.title||"Videoclip").trim()||"Videoclip";
+    const v=map.get(key)||{title:key,count:0,last:null,users:new Set(),stores:new Set()};
+    v.count++; if(x.email)v.users.add(displayUser(x.email)); if(x.storeName)v.stores.add(x.storeName);
+    if(!v.last || valueToMillis(x.createdAt)>valueToMillis(v.last))v.last=x.createdAt; map.set(key,v);
+  });
+  return [...map.values()].sort((a,b)=>b.count-a.count || valueToMillis(b.last)-valueToMillis(a.last)).slice(0,5);
+}
+
 function setupDashboardInteractions() {
   document.querySelectorAll("[data-stat-details]").forEach(button => {
     button.onclick = async event => {
@@ -970,17 +988,15 @@ function setupDashboardInteractions() {
             }))
         );
       } else if (key === "videos") {
+        const top5=topVideoStats(views);
         openDashboardDetails(
-          "Vizualizări videoclipuri",
-          "Videoclipurile accesate și utilizatorii care le-au vizualizat.",
-          [...views]
-            .filter(x=>normType(x.type)==="videoclip")
-            .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
-            .map(x=>({
-              title:x.title || "Videoclip",
-              detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
-              when:dashboardTimestamp(x.createdAt)
-            }))
+          "Top 5 videoclipuri",
+          "Cele mai vizionate videoclipuri. Pentru fiecare vezi numărul de accesări, utilizatorii și ultima vizualizare.",
+          top5.map((x,i)=>({
+            title:`${i+1}. ${x.title}`,
+            detail:`${x.count} vizualizări · ${x.users.size} utilizatori${x.stores.size ? ` · ${x.stores.size} magazine` : ""} · ${[...x.users].slice(0,5).join(", ")}${x.users.size>5 ? "…" : ""}`,
+            when:`Ultima vizualizare: ${dashboardTimestamp(x.last)}`
+          }))
         );
       } else if (key === "procedures") {
         openDashboardDetails(
@@ -1019,6 +1035,20 @@ function setupDashboardInteractions() {
           }))
         );
       }
+    };
+  });
+  document.querySelectorAll("[data-stat-export]").forEach(button=>{
+    button.onclick=event=>{
+      event.preventDefault(); event.stopPropagation();
+      const key=button.dataset.statExport, {sessions,views,shares}=dashboardDetailCache;
+      if(key==="logins") exportDashboardExcel("Autentificari_SmartID.xls",["Utilizator","Magazin","ID magazin","Rol","Data/Ora"],[...sessions].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt)).map(x=>[displayUser(x.email),x.storeName||"",x.storeId||"",x.role||"",dashboardTimestamp(x.createdAt)]));
+      if(key==="stores"){
+        const m=new Map(); sessions.forEach(x=>{if(!x.storeId&&!x.storeName)return;const k=x.storeId||x.storeName,v=m.get(k)||{name:x.storeName||"Magazin",id:x.storeId||"",count:0,last:x.createdAt};v.count++;if(valueToMillis(x.createdAt)>valueToMillis(v.last))v.last=x.createdAt;m.set(k,v)});
+        exportDashboardExcel("Magazine_active_SmartID.xls",["Magazin","ID","Autentificări","Ultima accesare"],[...m.values()].sort((a,b)=>b.count-a.count).map(x=>[x.name,x.id,x.count,dashboardTimestamp(x.last)]));
+      }
+      if(key==="videos") exportDashboardExcel("Top_5_videoclipuri_SmartID.xls",["Loc","Videoclip","Vizualizări","Utilizatori","Magazine","Ultima vizualizare"],topVideoStats(views).map((x,i)=>[i+1,x.title,x.count,[...x.users].join(", "),[...x.stores].join(", "),dashboardTimestamp(x.last)]));
+      if(key==="procedures") exportDashboardExcel("Proceduri_SmartID.xls",["Procedură","Utilizator","Magazin","Data/Ora"],[...views].filter(x=>normType(x.type)==="procedura").sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt)).map(x=>[x.title||"Procedură",displayUser(x.email),x.storeName||"",dashboardTimestamp(x.createdAt)]));
+      if(key==="shares") exportDashboardExcel("Distribuiri_SmartID.xls",["Material","Utilizator","Metodă","Data/Ora"],[...shares].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt)).map(x=>[x.title||"Material",displayUser(x.email),x.method||x.channel||"Distribuire",dashboardTimestamp(x.createdAt)]));
     };
   });
   if (el("approvalNotifyBtn")) el("approvalNotifyBtn").onclick = () => {
@@ -1063,6 +1093,11 @@ async function loadDashboard() {
     el("statVideos").textContent = videoViews;
     el("statProcedures").textContent = procedureViews;
     el("statShares").textContent = shares.length;
+    if (el("topVideoPreview")) {
+      const top5=topVideoStats(views);
+      el("topVideoPreview").textContent = top5.length ? top5.map((x,i)=>`${i+1}. ${x.title} (${x.count})`).join(" · ") : "Nu există încă vizualizări.";
+      el("topVideoPreview").title = el("topVideoPreview").textContent;
+    }
 
     const pendingCount = materials.filter(m => (m.status || "approved") === "pending").length;
     if (el("statPending")) el("statPending").textContent = pendingCount;
@@ -1363,6 +1398,45 @@ async function recommendStoreByLocation(){
       box.innerHTML=`Magazin recomandat: <b>${escapeHtml(best.name||best.id)}</b> · ID ${escapeHtml(best.id)} · ${best.distance.toFixed(1)} km`;box.className="geo-recommendation good";el("storeCode").value=best.id;
     }catch(err){box.textContent="Nu am putut calcula recomandarea.";box.className="geo-recommendation warn";}
   },()=>{box.textContent="Locația nu a fost permisă. Poți introduce ID-ul manual.";box.className="geo-recommendation warn";},{enableHighAccuracy:true,timeout:8000,maximumAge:300000});
+}
+
+async function loadUsers() {
+  const list = el("usersList");
+  if (!list) return;
+  list.innerHTML = '<div class="empty">Se încarcă utilizatorii...</div>';
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    const users = snap.docs.map(d => ({ email: d.id, ...d.data() }))
+      .sort((a,b) => String(a.displayName || a.email).localeCompare(String(b.displayName || b.email), "ro"));
+    if (!users.length) {
+      list.innerHTML = '<div class="empty">Nu există conturi configurate.</div>';
+      return;
+    }
+    const roleLabel = { admin:"Admin", suport:"Utilizator intern", carrefour:"User Carrefour", franciza:"User Franciză" };
+    const categoryLabel = { all:"Toate categoriile", suport:"Suport", carrefour:"Carrefour", franciza:"Franciză" };
+    list.innerHTML = users.map(u => `
+      <div class="store-row user-profile-row" data-user-email="${escapeHtml(u.email)}" style="cursor:pointer">
+        <div><b>${escapeHtml(u.displayName || u.email)}</b><small>${escapeHtml(u.email)}</small></div>
+        <div><b>${escapeHtml(roleLabel[u.role] || u.role || "-")}</b><small>${escapeHtml(categoryLabel[u.category] || u.category || "-")}</small></div>
+        <div><small>${u.canAdd ? "✓ Adăugare materiale" : "— Fără adăugare"}</small><small>${u.canManage ? "✓ Editare/ștergere" : "— Fără editare/ștergere"}</small></div>
+        <button type="button" class="secondary" data-edit-user="${escapeHtml(u.email)}">Editează</button>
+      </div>`).join("");
+    list.querySelectorAll("[data-edit-user]").forEach(btn => btn.addEventListener("click", e => {
+      e.preventDefault(); e.stopPropagation();
+      const u = users.find(x => x.email === btn.dataset.editUser); if (!u) return;
+      if (el("userDisplayName")) el("userDisplayName").value = u.displayName || "";
+      el("userEmail").value = u.email || "";
+      el("userRole").value = u.role || "suport";
+      el("userCategory").value = u.category || "all";
+      el("userCanAdd").checked = !!u.canAdd;
+      el("userCanManage").checked = !!u.canManage;
+      el("userStatus").textContent = `Editezi drepturile pentru ${u.displayName || u.email}.`;
+      el("userEmail").scrollIntoView({behavior:"smooth", block:"center"});
+    }));
+  } catch (error) {
+    console.error("Încărcare utilizatori:", error);
+    list.innerHTML = '<div class="empty">Utilizatorii nu au putut fi încărcați. Verifică drepturile Firestore.</div>';
+  }
 }
 
 async function saveUserProfile(){if(!isPrimaryAdmin()){el("userStatus").textContent="Doar Adminul principal poate modifica drepturile.";return;}const email=el("userEmail").value.trim().toLowerCase();if(!email){el("userStatus").textContent="Completează emailul.";return;}await setDoc(doc(db,"users",email),{displayName:el("userDisplayName")?.value||"",role:el("userRole").value,category:el("userCategory").value,canAdd:el("userCanAdd").checked,canManage:el("userCanManage").checked,canManageUsers:false,updatedAt:serverTimestamp(),updatedBy:currentEmail},{merge:true});const savedName=el("userDisplayName")?.value||"";
