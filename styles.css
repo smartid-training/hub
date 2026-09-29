@@ -1962,3 +1962,59 @@ body:not(.admin-mode) .support-card-intern .support-zone-visual img{
   body:not(.admin-mode) .support-zone-visual{min-height:185px!important}
   body:not(.admin-mode) .support-zone-visual img{height:135px!important}
 }
+
+
+/* === FINAL 29.09.2026 — Admin Dashboard: chenare aliniate + sigla Smart ID === */
+.topbar-smartid-logo{
+  width:112px;
+  height:38px;
+  object-fit:contain;
+  object-position:left center;
+  display:block;
+}
+.dashboard-pro-list{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:14px!important;
+}
+.dashboard-pro-card{
+  display:grid!important;
+  grid-template-columns:58px minmax(0,1fr)!important;
+  grid-template-rows:auto auto!important;
+  align-items:center!important;
+  gap:10px 14px!important;
+  min-height:178px!important;
+  padding:18px!important;
+  overflow:hidden!important;
+}
+.dashboard-pro-card .metric-icon{
+  width:54px!important;
+  height:54px!important;
+  font-size:24px!important;
+  grid-row:1!important;
+  grid-column:1!important;
+}
+.dashboard-pro-card .metric-copy{
+  grid-row:1!important;
+  grid-column:2!important;
+  min-width:0!important;
+}
+.dashboard-pro-card .metric-copy strong{font-size:28px!important}
+.dashboard-pro-card .metric-copy p{min-height:34px!important}
+.dashboard-pro-card .metric-line{display:none!important}
+.dashboard-pro-card .metric-details{
+  grid-row:2!important;
+  grid-column:1 / -1!important;
+  justify-self:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  text-align:center!important;
+}
+@media(max-width:1100px){
+  .dashboard-pro-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:680px){
+  .topbar-smartid-logo{width:88px;height:32px}
+  .brand{font-size:18px!important}
+  .dashboard-pro-list{grid-template-columns:1fr!important}
+  .dashboard-pro-card{min-height:0!important}
+}
