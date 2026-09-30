@@ -941,7 +941,7 @@ function topVideoStats(views) {
     v.count++; if(x.email)v.users.add(displayUser(x.email)); if(x.storeName)v.stores.add(x.storeName);
     if(!v.last || valueToMillis(x.createdAt)>valueToMillis(v.last))v.last=x.createdAt; map.set(key,v);
   });
-  return [...map.values()].sort((a,b)=>b.count-a.count || valueToMillis(b.last)-valueToMillis(a.last)).slice(0,10);
+  return [...map.values()].sort((a,b)=>b.count-a.count || valueToMillis(b.last)-valueToMillis(a.last));
 }
 
 function setupDashboardInteractions() {
@@ -990,8 +990,8 @@ function setupDashboardInteractions() {
       } else if (key === "videos") {
         const top5=topVideoStats(views);
         openDashboardDetails(
-          "Top 10 videoclipuri",
-          "Cele mai vizionate videoclipuri. Pentru fiecare vezi numărul de accesări, utilizatorii și ultima vizualizare.",
+          "Toate videoclipurile · ordonate după accesări",
+          "Toate videoclipurile, de la cele mai accesate la cele mai puțin accesate. Pentru fiecare vezi numărul de accesări, utilizatorii și ultima vizualizare.",
           top5.map((x,i)=>({
             title:`${i+1}. ${x.title}`,
             detail:`${x.count} vizualizări · ${x.users.size} utilizatori${x.stores.size ? ` · ${x.stores.size} magazine` : ""} · ${[...x.users].slice(0,5).join(", ")}${x.users.size>5 ? "…" : ""}`,
@@ -999,17 +999,22 @@ function setupDashboardInteractions() {
           }))
         );
       } else if (key === "procedures") {
+        const procedureMap = new Map();
+        views.filter(x=>normType(x.type)==="procedura").forEach(x=>{
+          const key=String(x.title||"Procedură").trim()||"Procedură";
+          const v=procedureMap.get(key)||{title:key,count:0,last:null,users:new Set(),stores:new Set()};
+          v.count++; if(x.email)v.users.add(displayUser(x.email)); if(x.storeName)v.stores.add(x.storeName);
+          if(!v.last || valueToMillis(x.createdAt)>valueToMillis(v.last))v.last=x.createdAt; procedureMap.set(key,v);
+        });
+        const allProcedures=[...procedureMap.values()].sort((a,b)=>b.count-a.count || valueToMillis(b.last)-valueToMillis(a.last));
         openDashboardDetails(
-          "Vizualizări proceduri",
-          "Procedurile accesate și utilizatorii care le-au consultat.",
-          [...views]
-            .filter(x=>normType(x.type)==="procedura")
-            .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
-            .map(x=>({
-              title:x.title || "Procedură",
-              detail:`${displayUser(x.email)}${x.storeName ? ` · ${x.storeName}` : ""}`,
-              when:dashboardTimestamp(x.createdAt)
-            }))
+          "Toate procedurile · ordonate după accesări",
+          "Toate procedurile, de la cele mai accesate la cele mai puțin accesate.",
+          allProcedures.map((x,i)=>({
+            title:`${i+1}. ${x.title}`,
+            detail:`${x.count} vizualizări · ${x.users.size} utilizatori${x.stores.size ? ` · ${x.stores.size} magazine` : ""}`,
+            when:`Ultima vizualizare: ${dashboardTimestamp(x.last)}`
+          }))
         );
       } else if (key === "shares") {
         openDashboardDetails(
@@ -1739,3 +1744,31 @@ document.addEventListener('click', function(e){
   const ch=btn.querySelector('.equipment-chevron');
   if(ch) ch.textContent=open?'⌄':'⌃';
 });
+
+
+// v14 verified dashboard team presentation: people first, recent activity visible, no chart.
+function renderTeamCollapsedPreview(){
+  const people=document.getElementById('teamPeoplePreview');
+  const recent=document.getElementById('teamRecentPreview');
+  if(!people||!recent) return;
+  const acts=[...(dashboardDetailCache.teamActivity||[])].sort((x,y)=>valueToMillis(y.createdAt)-valueToMillis(x.createdAt));
+  const configured=[...usersNameMap.values()].filter(Boolean).filter(n=>String(n).toLowerCase()!=='admin principal');
+  const activeNames=acts.map(x=>displayUser(x.email)).filter(Boolean).filter(n=>n!=='Admin principal');
+  const names=[...new Set([...configured,...TEAM_DISPLAY_NAMES,...activeNames])];
+  people.innerHTML=names.slice(0,8).map(n=>`<span class="person-chip">${escapeHtml(n)}</span>`).join('');
+  recent.innerHTML=acts.length?acts.slice(0,3).map(a=>`<div class="recent-preview-row"><b>${escapeHtml(displayUser(a.email))}</b><span>${escapeHtml(v8ActionLabel(a.action))} · ${escapeHtml(a.title||'Material')}</span><small>${escapeHtml(dashboardTimestamp(a.createdAt))}</small></div>`).join(''):'<div class="empty-inline">Nu există încă activitate recentă.</div>';
+}
+
+const _renderV8TeamOriginal=renderV8Team;
+renderV8Team=function(){
+ const box=document.getElementById('teamInlineDetails'); if(!box)return;
+ const acts=[...(dashboardDetailCache.teamActivity||[])].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt));
+ const byEmail=new Map();
+ [...usersNameMap.entries()].forEach(([email,name])=>{if(name && String(name).toLowerCase()!=='admin principal') byEmail.set(email,{name,items:[],last:null});});
+ acts.forEach(a=>{const email=String(a.email||'').toLowerCase()||'necunoscut';const v=byEmail.get(email)||{name:displayUser(a.email),items:[],last:null};v.items.push(a);if(!v.last||valueToMillis(a.createdAt)>valueToMillis(v.last))v.last=a.createdAt;byEmail.set(email,v)});
+ const rows=[...byEmail.entries()].sort((a,b)=>valueToMillis(b[1].last)-valueToMillis(a[1].last)||String(a[1].name).localeCompare(String(b[1].name),'ro'));
+ box.innerHTML=`<div class="team-summary-head apple-team-head"><div><b>Activitate colegi</b><span>Vezi imediat ce a făcut fiecare coleg recent. Apasă pe nume pentru tot istoricul.</span></div><button class="inline-text-action" id="v8TeamExport">Export Excel ↗</button></div><div class="team-person-list">${rows.length?rows.map(([email,v],i)=>`<article class="team-person-row"><button type="button" class="apple-person-name" data-team-index="${i}">${escapeHtml(v.name||email)}<span>⌄</span></button><div class="team-person-recent">${v.items.length?v.items.slice(0,2).map(a=>`<div class="team-person-action"><span>${escapeHtml(v8ActionLabel(a.action))}</span><b>${escapeHtml(a.title||'Material')}</b><small>${escapeHtml(dashboardTimestamp(a.createdAt))}</small></div>`).join(''):'<span class="no-recent">Fără activitate recentă</span>'}</div><div class="team-user-history hidden" id="teamHistory${i}"></div></article>`).join(''):'<div class="empty">Nu există colegi configurați.</div>'}</div>`;
+ box.querySelectorAll('.apple-person-name').forEach(btn=>btn.onclick=e=>{e.stopPropagation();const i=Number(btn.dataset.teamIndex),v=rows[i][1],hist=document.getElementById('teamHistory'+i),open=hist.classList.contains('hidden');if(open){hist.innerHTML=`<div class="apple-history-title">Istoric complet</div>`+(v.items.length?v.items.map(a=>`<div class="team-history-row"><b>${escapeHtml(v8ActionLabel(a.action))}</b><span>${escapeHtml(a.title||'Material')}${a.type?' · '+escapeHtml(a.type):''}</span><small>${escapeHtml(dashboardTimestamp(a.createdAt))}</small></div>`).join(''):'<div class="no-recent">Fără activitate înregistrată.</div>');hist.classList.remove('hidden');btn.classList.add('open')}else{hist.classList.add('hidden');btn.classList.remove('open')}});
+ const exp=document.getElementById('v8TeamExport'); if(exp) exp.onclick=e=>{e.stopPropagation();exportDashboardExcel('Activitate_echipa_SmartID.xls',['Utilizator','Acțiune','Material','Tip','Data/Ora'],acts.map(a=>[displayUser(a.email),v8ActionLabel(a.action),a.title||'',a.type||'',dashboardTimestamp(a.createdAt)]));};
+};
+setInterval(renderTeamCollapsedPreview,900);
