@@ -941,7 +941,7 @@ function topVideoStats(views) {
     v.count++; if(x.email)v.users.add(displayUser(x.email)); if(x.storeName)v.stores.add(x.storeName);
     if(!v.last || valueToMillis(x.createdAt)>valueToMillis(v.last))v.last=x.createdAt; map.set(key,v);
   });
-  return [...map.values()].sort((a,b)=>b.count-a.count || valueToMillis(b.last)-valueToMillis(a.last)).slice(0,5);
+  return [...map.values()].sort((a,b)=>b.count-a.count || valueToMillis(b.last)-valueToMillis(a.last)).slice(0,10);
 }
 
 function setupDashboardInteractions() {
@@ -990,7 +990,7 @@ function setupDashboardInteractions() {
       } else if (key === "videos") {
         const top5=topVideoStats(views);
         openDashboardDetails(
-          "Top 5 videoclipuri",
+          "Top 10 videoclipuri",
           "Cele mai vizionate videoclipuri. Pentru fiecare vezi numărul de accesări, utilizatorii și ultima vizualizare.",
           top5.map((x,i)=>({
             title:`${i+1}. ${x.title}`,
@@ -1290,6 +1290,7 @@ function renderStores() {
 
 function editStore(storeId) {
   if (currentRole !== "admin") return;
+  el("storeEditorPanel")?.classList.remove("hidden");
 
   const store = storesCache.find(item => String(item.id) === String(storeId));
   if (!store) {
@@ -1384,6 +1385,7 @@ async function saveStore() {
   el("newStoreName").value = "";
   el("newStoreActive").value = "true";
   await loadStores();
+  el("storeEditorPanel")?.classList.add("hidden");
 }
 
 
@@ -1553,10 +1555,17 @@ el("closeViewerBtn").addEventListener("click", () => {
   el("viewer").classList.remove("open");
   el("viewerFrame").src = "about:blank";
   currentOpenMaterial = null;
+  // Pentru utilizatorii portalului, revenirea dintr-un clip/procedură trebuie să ducă
+  // întotdeauna în meniul principal de echipamente, nu într-o pagină intermediară goală.
+  if (currentRole !== "admin") {
+    renderEquipment();
+    showPage("equipmentPage");
+  }
 });
 el("saveMaterialBtn").addEventListener("click", saveMaterial);
 el("cancelEditMaterialBtn").addEventListener("click", () => { resetMaterialForm(); el("materialStatus").textContent = ""; });
 el("saveStoreBtn").addEventListener("click", saveStore);
+el("closeStoreEditor")?.addEventListener("click",()=>el("storeEditorPanel")?.classList.add("hidden"));
 el("newStoreCategory").addEventListener("change", toggleStoreFormat);
 el("storeSearch").addEventListener("input", renderStores);
 el("storeFilter").addEventListener("change", renderStores);
@@ -1693,7 +1702,7 @@ function v8Rows(type){
 function toggleV8Stat(type,card){
  const box=document.getElementById('statInlineDetails'), rows=v8Rows(type); if(!box)return;
  if(box.dataset.open===type&&!box.classList.contains('hidden')){box.classList.add('hidden');box.dataset.open='';return;}
- const titles={logins:'Autentificări',stores:'Magazine active',videos:'Top 5 videoclipuri',procedures:'Vizualizări proceduri',shares:'Distribuiri'};
+ const titles={logins:'Autentificări',stores:'Magazine active',videos:'Top 10 videoclipuri',procedures:'Vizualizări proceduri',shares:'Distribuiri'};
  box.dataset.open=type;box.classList.remove('hidden');box.innerHTML=`<div class="stat-inline-head"><h2>${titles[type]}</h2><button class="inline-text-action" id="v8ExportStat">Export Excel ↗</button></div><div class="stat-inline-list">${rows.length?rows.map(r=>`<div class="stat-inline-row"><b>${escapeHtml(r.t)}</b><span>${escapeHtml(r.d)}</span><small>${escapeHtml(r.w)}</small></div>`).join(''):'<div class="empty">Nu există încă informații.</div>'}</div>`;
  document.getElementById('v8ExportStat').onclick=e=>{e.stopPropagation();exportDashboardExcel(`${titles[type].replace(/\s+/g,'_')}_SmartID.xls`,['Element','Detalii','Data/Ora'],rows.map(r=>[r.t,r.d,r.w]));};
  box.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -1701,11 +1710,12 @@ function toggleV8Stat(type,card){
 function renderV8Team(){
  const box=document.getElementById('teamInlineDetails'); if(!box)return;
  const acts=[...(dashboardDetailCache.teamActivity||[])].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt));
- const map=new Map();acts.forEach(a=>{const e=a.email||'Necunoscut',v=map.get(e)||{total:0,adds:0,edits:0,approvals:0,last:null};v.total++;if(a.action==='material_added')v.adds++;if(a.action==='material_edited')v.edits++;if(a.action==='material_approved')v.approvals++;if(!v.last||valueToMillis(a.createdAt)>valueToMillis(v.last))v.last=a.createdAt;map.set(e,v)});
- const rows=[...map.entries()].sort((a,b)=>b[1].total-a[1].total);
- box.innerHTML=`<div class="team-summary-head"><div><b>Activitate pe colegi</b><span>Apasă pe un coleg pentru istoricul complet.</span></div><button class="inline-text-action" id="v8TeamExport">Export Excel ↗</button></div><div class="team-table-head"><span>Coleg</span><span>Total</span><span>Adăugări</span><span>Editări</span><span>Aprobări</span><span>Ultima activitate</span><span></span></div>${rows.length?rows.map(([e,v],i)=>`<div class="team-table-row team-user-summary" data-team-index="${i}"><b>${escapeHtml(displayUser(e))}</b><span>${v.total}</span><span>${v.adds}</span><span>${v.edits}</span><span>${v.approvals}</span><span>${escapeHtml(dashboardTimestamp(v.last))}</span><span class="team-row-chevron">⌄</span></div><div class="team-user-history hidden" id="teamHistory${i}"></div>`).join(''):'<div class="empty">Nu există încă activitate.</div>'}`;
+ const map=new Map();
+ acts.forEach(a=>{const e=a.email||'Necunoscut';const v=map.get(e)||{items:[],last:null};v.items.push(a);if(!v.last||valueToMillis(a.createdAt)>valueToMillis(v.last))v.last=a.createdAt;map.set(e,v)});
+ const rows=[...map.entries()].sort((a,b)=>valueToMillis(b[1].last)-valueToMillis(a[1].last));
+ box.innerHTML=`<div class="team-summary-head apple-team-head"><div><b>Activitate colegi</b><span>Activitățile recente sunt vizibile direct. Apasă pe nume pentru istoricul complet.</span></div><button class="inline-text-action" id="v8TeamExport">Export Excel ↗</button></div><div class="apple-team-grid">${rows.length?rows.map(([e,v],i)=>`<article class="apple-team-person"><button type="button" class="apple-person-name" data-team-index="${i}">${escapeHtml(displayUser(e))}<span>⌄</span></button><div class="apple-recent-title">Recent</div><div class="apple-recent-list">${v.items.slice(0,3).map(a=>`<div class="apple-recent-row"><b>${escapeHtml(v8ActionLabel(a.action))}</b><span>${escapeHtml(a.title||'Material')}</span><small>${escapeHtml(dashboardTimestamp(a.createdAt))}</small></div>`).join('')||'<div class="empty">Fără activitate recentă.</div>'}</div><div class="team-user-history hidden" id="teamHistory${i}"></div></article>`).join(''):'<div class="empty">Nu există încă activitate.</div>'}</div>`;
  const entries=rows;
- box.querySelectorAll('.team-user-summary').forEach(row=>row.onclick=e=>{e.stopPropagation();const i=Number(row.dataset.teamIndex), email=entries[i][0], hist=document.getElementById('teamHistory'+i), open=hist.classList.contains('hidden');box.querySelectorAll('.team-user-history').forEach(x=>x.classList.add('hidden'));box.querySelectorAll('.team-user-summary').forEach(x=>x.classList.remove('open'));if(open){const own=acts.filter(a=>(a.email||'Necunoscut')===email);hist.innerHTML=own.map(a=>`<div class="team-history-row"><b>${escapeHtml(v8ActionLabel(a.action))}</b><span>${escapeHtml(a.title||'Material')}${a.type?' · '+escapeHtml(a.type):''}</span><small>${escapeHtml(dashboardTimestamp(a.createdAt))}</small></div>`).join('');hist.classList.remove('hidden');row.classList.add('open')}});
+ box.querySelectorAll('.apple-person-name').forEach(btn=>btn.onclick=e=>{e.stopPropagation();const i=Number(btn.dataset.teamIndex),email=entries[i][0],hist=document.getElementById('teamHistory'+i),open=hist.classList.contains('hidden');if(open){const own=acts.filter(a=>(a.email||'Necunoscut')===email);hist.innerHTML=`<div class="apple-history-title">Istoric complet</div>`+own.map(a=>`<div class="team-history-row"><b>${escapeHtml(v8ActionLabel(a.action))}</b><span>${escapeHtml(a.title||'Material')}${a.type?' · '+escapeHtml(a.type):''}</span><small>${escapeHtml(dashboardTimestamp(a.createdAt))}</small></div>`).join('');hist.classList.remove('hidden');btn.classList.add('open')}else{hist.classList.add('hidden');btn.classList.remove('open')}});
  document.getElementById('v8TeamExport').onclick=e=>{e.stopPropagation();exportDashboardExcel('Activitate_echipa_SmartID.xls',['Utilizator','Acțiune','Material','Tip','Data/Ora'],acts.map(a=>[displayUser(a.email),v8ActionLabel(a.action),a.title||'',a.type||'',dashboardTimestamp(a.createdAt)]));};
 }
 function initV8Dashboard(){

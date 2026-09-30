@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SmartID Portal</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="smartid-favicon.png?v=9">
+  <link rel="icon" type="image/png" href="smartid-favicon.png?v=13">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -39,7 +39,7 @@
     <header class="topbar">
       <div class="brand-row">
         <button id="menuBtn" class="menu-btn hidden" aria-label="Meniu">☰</button>
-        <div class="smartid-wordmark smartid-wordmark-large" aria-label="SmartID"><span>smart</span><b>ID</b></div>
+        <img src="smartid-logo-user.png" alt="SmartID" class="topbar-smartid-original">
         <strong class="brand">Portal</strong>
       </div>
       <div class="top-actions">
@@ -48,7 +48,7 @@
           <input id="searchInput" class="search" placeholder="Caută după titlu, descriere sau tag...">
         </div>
         <div id="userRoleBadge" class="user-role-badge hidden"></div>
-        <button id="approvalNotifyBtn" class="approval-notify hidden" type="button" title="Materiale de aprobat">✓ <b id="approvalNotifyCount">0</b></button>
+        <button id="approvalNotifyBtn" class="approval-notify hidden" type="button" title="Materiale de aprobat"><span class="approval-bell">🔔</span><span>Aprobări</span><b id="approvalNotifyCount">0</b></button>
         <button id="logoutBtn" class="logout">Logout</button>
       </div>
     </header>
@@ -103,7 +103,7 @@
             <div class="metric-icon">▶</div>
             <div class="metric-copy">
               <strong id="statVideos">0</strong>
-              <h3>Top 5 videoclipuri</h3>
+              <h3>Top 10 videoclipuri</h3>
               <p id="topVideoPreview">Cele mai vizionate videoclipuri din portal.</p>
             </div>
             <div class="metric-line" aria-hidden="true"></div>
@@ -136,7 +136,7 @@
         </div>
 
         <section id="topFiveInline" class="dashboard-inline-section top-five-inline">
-          <div class="inline-section-head"><div><span class="eyebrow">TOP 5</span><h2>Cele mai vizionate videoclipuri</h2></div><button class="inline-text-action" id="exportTop5Inline" type="button">Export Excel ↗</button></div>
+          <div class="inline-section-head"><div><span class="eyebrow">TOP 10</span><h2>Cele mai accesate videoclipuri</h2></div><button class="inline-text-action" id="exportTop5Inline" type="button">Export Excel ↗</button></div>
           <div id="topFiveInlineList" class="top-five-list"><div class="empty">Se încarcă...</div></div>
         </section>
 
@@ -275,7 +275,8 @@
 
       <section id="storesPage" class="page hidden">
         <div class="page-head"><div><h1>Administrare magazine</h1><p class="subtitle">Adaugă, caută și filtrează magazinele.</p></div></div>
-        <section class="panel">
+        <section id="storeEditorPanel" class="panel hidden store-editor-panel">
+          <div class="store-editor-head"><div><h2>Editare magazin</h2><p>Modifică datele magazinului selectat.</p></div><button id="closeStoreEditor" type="button" class="secondary">Închide</button></div>
           <div class="form-grid">
             <input id="newStoreId" placeholder="ID magazin">
             <input id="newStoreName" placeholder="Nume magazin">

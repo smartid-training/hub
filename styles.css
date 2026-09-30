@@ -2113,3 +2113,88 @@ body:not(.admin-mode) .support-card-intern .support-zone-visual img{
 .team-table-head,.team-table-row{grid-template-columns:minmax(170px,1.3fr) 62px 76px 70px 72px minmax(150px,1fr) 26px!important}.team-user-summary{cursor:pointer;transition:background .15s}.team-user-summary:hover,.team-user-summary.open{background:#f5fbfa}.team-row-chevron{font-size:16px!important;color:#08766f!important;text-align:center;transition:transform .2s}.team-user-summary.open .team-row-chevron{transform:rotate(180deg)}
 .team-user-history{background:#fbfdfd;border-top:1px solid #edf2f4;border-bottom:1px solid #e5ecee;padding:4px 16px 8px 34px}.team-history-row{display:grid;grid-template-columns:90px minmax(240px,1fr) auto;gap:14px;align-items:center;padding:8px 0;border-bottom:1px solid #edf2f4;font-size:10.5px}.team-history-row:last-child{border-bottom:0}.team-history-row b{color:#08766f}.team-history-row span,.team-history-row small{color:#667085}.team-history-row small{white-space:nowrap}
 @media(max-width:1200px){.dashboard-pro-list{grid-template-columns:repeat(5,minmax(205px,1fr))!important;overflow-x:auto!important}.team-table-head,.team-table-row{min-width:850px}.team-inline-details{overflow-x:auto!important}}
+
+/* v11: keep the user-provided SmartID logo unchanged */
+.topbar-smartid-original{display:block;width:112px;height:48px;object-fit:contain;object-position:center;flex:0 0 auto}.brand-row{gap:10px}.brand{margin-left:0!important}@media(max-width:680px){.topbar-smartid-original{width:92px;height:40px}}
+
+/* === v12: corporate/HIG polish + user navigation fix === */
+:root{--smart-teal:#0bb99f;--smart-ink:#091d1f;--smart-surface:#f6f8fa;--smart-line:#dbe4e7}
+body{background:#f5f7f9}
+.content{max-width:1760px;padding:22px 28px}
+.topbar{height:68px;padding:0 22px;background:#061b1d}
+.brand-row{gap:8px}
+.topbar-smartid-original{width:154px!important;height:44px!important;object-fit:contain!important;object-position:left center!important;border-radius:8px;background:#fff;padding:4px 7px}
+.brand{font-size:18px!important;font-weight:800}
+.search-wrap .search-icon{font-size:23px!important;left:14px!important;line-height:1;color:#11a9df!important}
+.search{width:330px!important;height:40px!important;padding-left:45px!important;background:#fff!important;color:#24343a!important;border:1px solid #d5e0e3!important}
+.logout{padding:10px 18px!important;background:#4cc3ad!important;color:#052b28!important}
+
+/* Dashboard: Apple/HIG-like cards, consistent hierarchy */
+.dashboard-pro-list{gap:16px!important}
+.dashboard-pro-card{min-height:142px!important;padding:20px!important;border:1px solid var(--smart-line)!important;border-radius:18px!important;background:#fff!important;box-shadow:0 5px 18px rgba(12,35,38,.055)!important}
+.dashboard-pro-card:hover{transform:translateY(-2px)!important;box-shadow:0 10px 26px rgba(12,35,38,.09)!important}
+.dashboard-pro-card .metric-copy h3{font-size:14px!important}.dashboard-pro-card .metric-copy p{font-size:11.5px!important;line-height:1.4!important}
+.dashboard-inline-section,.dashboard-team-pro,.team-inline-details{border-radius:18px!important;border-color:var(--smart-line)!important;box-shadow:0 5px 18px rgba(12,35,38,.045)!important}
+.top-five-item{border:1px solid #e3eaec!important;background:#fbfcfd!important}
+
+/* Activity: names first, smaller clean rows; details only on demand */
+.team-table-head,.team-table-row{grid-template-columns:minmax(190px,1.6fr) 70px 78px 72px 76px minmax(165px,1.1fr) 30px!important}
+.team-table-row{padding:9px 16px!important;min-height:46px!important}
+.team-user-history{padding-left:28px!important;background:#fafcfc!important}
+.team-history-row{padding:7px 0!important}
+
+/* Users: compact professional permissions */
+#usersPage .panel{border:1px solid var(--smart-line);border-radius:18px;box-shadow:0 5px 18px rgba(12,35,38,.05)}
+#usersPage .form-grid{grid-template-columns:1.15fr 1.35fr .9fr .9fr;align-items:center}
+#usersPage .form-grid label{display:flex;align-items:center;gap:8px;width:max-content;padding:10px 12px;border:1px solid #e1e8ea;border-radius:10px;background:#f8fafb;font-size:13px}
+#usersPage .form-grid label input{width:auto}
+.user-profile-row{display:grid!important;grid-template-columns:1.4fr 1fr 1.4fr auto;gap:18px;align-items:center;padding:12px 0!important}
+.user-profile-row small{display:block;margin-top:3px;color:#667085}
+.user-profile-row .secondary{padding:9px 13px;border-radius:10px}
+
+/* Manage materials: selected procedure/card expands down, visually grouped */
+#manageMaterialsPage .panel{border-radius:18px;border-color:var(--smart-line);box-shadow:0 5px 18px rgba(12,35,38,.05)}
+.admin-material-row{padding:13px 8px!important;border-bottom:1px solid #edf1f2!important}
+.row-actions{gap:7px!important}.row-actions button{border-radius:9px!important;padding:8px 11px!important}
+
+/* Add material: tighter rows and equipment pills */
+#addMaterialPage .panel{padding:24px 26px 26px!important}
+#addMaterialPage .form-grid{gap:11px!important;margin:14px 0!important}
+#addMaterialPage input,#addMaterialPage select,#addMaterialPage textarea{border-radius:11px!important;padding:11px 12px!important}
+#addMaterialPage textarea{min-height:82px!important}
+#addMaterialPage .equipment-options{column-gap:34px!important;row-gap:8px!important}
+#addMaterialPage .equipment-options label{min-width:0!important;max-width:none!important;padding:7px 10px!important}
+
+@media(max-width:760px){
+ .topbar{display:grid!important;grid-template-columns:1fr auto;height:auto!important;padding:10px 12px!important;row-gap:9px}
+ .brand-row{min-width:0}.topbar-smartid-original{width:126px!important;height:38px!important}.brand{font-size:16px!important}
+ .top-actions{grid-column:1/-1;display:grid!important;grid-template-columns:1fr auto;gap:8px!important;width:100%}
+ .search-wrap{grid-column:1/-1;width:100%!important}.search{width:100%!important}
+ .logout{padding:9px 14px!important}.content{padding:14px!important}
+ #usersPage .form-grid{grid-template-columns:1fr!important}.user-profile-row{grid-template-columns:1fr!important}
+}
+
+/* === v13 Apple Cloud / HIG refinement === */
+:root{--apple-bg:#f5f5f7;--apple-card:rgba(255,255,255,.86);--apple-line:rgba(15,23,42,.09);--apple-text:#1d1d1f;--apple-secondary:#6e6e73;--apple-blue:#007aff;--apple-teal:#16a891}
+body,#app,.content,.page{background:linear-gradient(180deg,#f7fafb 0%,#f5f5f7 46%,#f3f6f8 100%)!important;color:var(--apple-text)!important}
+.content{max-width:1680px!important;margin:0 auto!important;padding:26px 32px 42px!important}
+.panel,.dashboard-pro-card,.dashboard-inline-section,.dashboard-team-pro,.team-inline-details{background:var(--apple-card)!important;backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border:1px solid var(--apple-line)!important;box-shadow:0 10px 35px rgba(15,23,42,.055)!important;border-radius:20px!important}
+.topbar{background:rgba(7,28,30,.96)!important;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(255,255,255,.08)}
+.topbar-smartid-original{width:170px!important;height:42px!important;background:#fff!important;border-radius:10px!important;padding:5px 10px!important;object-fit:contain!important;object-position:center!important}
+.search{border-radius:13px!important;box-shadow:inset 0 0 0 1px rgba(0,0,0,.03)!important}.search-wrap{border-radius:13px!important}
+.logout,.primary{border-radius:12px!important;box-shadow:none!important}.secondary{border-radius:11px!important}
+.approval-notify{display:inline-flex!important;align-items:center!important;gap:7px!important;height:40px!important;padding:0 11px!important;border:0!important;border-radius:12px!important;background:#fff!important;color:#1d1d1f!important;box-shadow:0 2px 10px rgba(0,0,0,.08)!important;font-size:12px!important}.approval-notify.hidden{display:none!important}.approval-notify b{background:#ff3b30!important;color:#fff!important}.approval-bell{font-size:14px}
+.dashboard-pro-card{border-radius:20px!important;box-shadow:0 8px 26px rgba(15,23,42,.05)!important;transition:transform .18s ease,box-shadow .18s ease!important}.dashboard-pro-card:hover{transform:translateY(-1px)!important;box-shadow:0 12px 32px rgba(15,23,42,.075)!important}
+.dashboard-pro-card .metric-copy strong{font-weight:700!important;letter-spacing:-.03em!important}.dashboard-pro-card .metric-copy h3{font-weight:650!important}.dashboard-pro-card .metric-copy p{color:var(--apple-secondary)!important}
+.inline-text-action{color:var(--apple-blue)!important;background:transparent!important;border:0!important;font-weight:600!important}
+
+/* Store page: list is the main view. Editor only appears after Edit. */
+#storesPage>.page-head{margin-bottom:14px!important}#storesPage>.page-head .subtitle{color:var(--apple-secondary)!important}
+.store-editor-panel{margin-bottom:16px!important}.store-editor-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}.store-editor-head h2{margin:0;font-size:18px}.store-editor-head p{margin:3px 0 0;color:var(--apple-secondary);font-size:12px}
+#storesPage .store-toolbar{display:grid;grid-template-columns:minmax(280px,1fr) 180px;gap:10px;margin-bottom:18px}.store-row{border-radius:14px!important;margin:7px 0!important;border:1px solid var(--apple-line)!important;background:rgba(255,255,255,.72)!important}.store-edit-btn{border:0!important;background:#eef6ff!important;color:#0066cc!important;border-radius:10px!important;padding:8px 12px!important}.store-delete-btn{border:0!important;background:#fff1f0!important;color:#c81e1e!important;border-radius:10px!important}
+
+/* Activity colleagues: no chart, compact name-sized controls, recent work visible. */
+.team-hidden-data,#teamCharts,.team-charts,.team-chart-card,.team-bar-row{display:none!important}
+.apple-team-head{padding:17px 18px!important}.apple-team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;padding:16px}.apple-team-person{background:rgba(255,255,255,.78);border:1px solid var(--apple-line);border-radius:17px;padding:14px 15px;min-width:0}.apple-person-name{width:max-content;max-width:100%;display:inline-flex;align-items:center;gap:8px;border:0;background:#eef6ff;color:#005fc7;border-radius:999px;padding:8px 12px;font:650 13px/1.1 Inter,sans-serif;cursor:pointer}.apple-person-name span{font-size:12px;transition:transform .18s}.apple-person-name.open span{transform:rotate(180deg)}.apple-recent-title,.apple-history-title{margin:13px 0 6px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8e8e93}.apple-recent-list{display:grid}.apple-recent-row{display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(15,23,42,.07);font-size:11px}.apple-recent-row:last-child{border-bottom:0}.apple-recent-row b{color:#1d1d1f}.apple-recent-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#515154}.apple-recent-row small{color:#8e8e93;white-space:nowrap}.apple-team-person .team-user-history{margin-top:10px;padding:8px 0 0!important;background:transparent!important;border-top:1px solid var(--apple-line)!important;border-bottom:0!important}.apple-team-person .team-history-row{grid-template-columns:82px minmax(0,1fr) auto!important;padding:8px 0!important}
+
+@media(max-width:760px){.content{padding:14px!important}.topbar-smartid-original{width:142px!important;height:38px!important}.apple-team-grid{grid-template-columns:1fr;padding:12px}.apple-recent-row,.apple-team-person .team-history-row{grid-template-columns:1fr!important;gap:3px}.store-editor-head{align-items:flex-start}.store-toolbar{grid-template-columns:1fr!important}}
