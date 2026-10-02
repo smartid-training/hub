@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=portal-pro-v9">
+  <link rel="stylesheet" href="styles.css?v=portal-v21-0210-1735">
 </head>
 <body>
   <main id="loginPage" class="login-page">
@@ -42,7 +42,6 @@
     <header class="topbar">
       <div class="brand-row">
         <button id="menuBtn" class="menu-btn hidden" aria-label="Meniu">☰</button>
-        <img src="smartid-logo-user.png?v=1710-logo-confirmat" alt="SmartID" class="topbar-smartid-original">
         <strong class="brand">Portal</strong>
       </div>
       <div class="top-actions">
@@ -106,7 +105,7 @@
             <div class="metric-icon">▶</div>
             <div class="metric-copy">
               <strong id="statVideos">0</strong>
-              <h3>Top 10 videoclipuri</h3>
+              <h3>Vizualizări videoclipuri</h3>
               <p id="topVideoPreview">Cele mai vizionate videoclipuri din portal.</p>
             </div>
             <div class="metric-mini-chart" aria-hidden="true"></div><div class="metric-line" aria-hidden="true"></div>
@@ -137,11 +136,6 @@
 
 
         </div>
-
-        <section id="topFiveInline" class="dashboard-inline-section top-five-inline">
-          <div class="inline-section-head"><div><span class="eyebrow">TOP 10</span><h2>Cele mai accesate videoclipuri</h2></div><button class="inline-text-action" id="exportTop5Inline" type="button">Export Excel ↗</button></div>
-          <div id="topFiveInlineList" class="top-five-list"><div class="empty">Se încarcă...</div></div>
-        </section>
 
         <div id="statInlineDetails" class="dashboard-inline-section stat-inline-details hidden"></div>
 
@@ -259,7 +253,7 @@
 
       <section id="manageMaterialsPage" class="page hidden">
         <div class="page-head"><div><h1>Gestionare materiale</h1><p class="subtitle">Gestionează materialele și aprobă publicarea celor încărcate de echipă.</p></div></div>
-        <section class="panel"><div class="store-toolbar"><input id="manageMaterialSearch" placeholder="Caută material..."><select id="manageMaterialType"><option value="all">Toate</option><option value="videoclip">Videoclipuri</option><option value="procedura">Proceduri</option></select></div><div id="adminMaterialsList"></div></section>
+        <section class="panel"><div class="store-toolbar single-search"><input id="manageMaterialSearch" placeholder="Caută material..."></div><div id="adminMaterialsList"></div></section>
       </section>
 
       <section id="usersPage" class="page hidden">
@@ -280,7 +274,6 @@
 
       <section id="storesPage" class="page hidden">
         <div class="page-head"><div><h1>Administrare magazine</h1><p class="subtitle">Adaugă, caută și filtrează magazinele.</p></div></div>
-        <div class="store-add-toolbar"><button id="addStoreBtn" type="button" class="primary">＋ Adaugă magazin</button></div>
         <section id="storeEditorPanel" class="panel hidden store-editor-panel">
           <div class="store-editor-head"><div><h2>Editare magazin</h2><p>Modifică datele magazinului selectat.</p></div><button id="closeStoreEditor" type="button" class="secondary">Închide</button></div>
           <div class="form-grid">
@@ -305,18 +298,11 @@
         </section>
 
         <section class="panel">
-          <div class="store-toolbar">
+          <div class="store-toolbar single-search">
             <input id="storeSearch" placeholder="Caută după ID sau nume...">
-            <select id="storeFilter">
-              <option value="all">Toate</option>
-              <option value="carrefour">Carrefour</option>
-              <option value="franciza">Franciză</option>
-              <option value="hiper">Hiper</option>
-              <option value="super">Super</option>
-              <option value="express">Express</option>
-            </select>
           </div>
           <div id="storesList"></div>
+          <div class="store-add-toolbar bottom-right"><button id="addStoreBtn" type="button" class="primary">＋ Adaugă magazin</button></div>
         </section>
       </section>
     </main>
@@ -344,6 +330,17 @@
     </header>
     <div class="viewer-body">
       <iframe id="viewerFrame" allowfullscreen></iframe>
+      <div class="viewer-engagement">
+        <div class="reaction-row">
+          <button id="likeMaterialBtn" class="engagement-btn" type="button">👍 Like <b id="likeCount">0</b></button>
+          <button id="unlikeMaterialBtn" class="engagement-btn" type="button">👎 Unlike <b id="unlikeCount">0</b></button>
+        </div>
+        <div class="comment-box">
+          <div class="comment-title">Comentarii <b id="commentCount">0</b></div>
+          <div id="commentsList" class="comments-list"></div>
+          <div class="comment-compose"><input id="commentInput" placeholder="Scrie un comentariu..."><button id="addCommentBtn" class="engagement-btn" type="button">Adaugă</button></div>
+        </div>
+      </div>
       <div class="share-bar">
         <button id="shareWhatsAppBtn" class="share-btn">WhatsApp</button>
         <button id="shareEmailBtn" class="share-btn">E-mail</button>

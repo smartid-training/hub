@@ -173,6 +173,7 @@ async function recordSession() {
 
 
 function configureAccountIdentity() {
+  document.body.classList.remove("role-carrefour","role-franciza");
   const badge = el("userRoleBadge");
   const hero = el("accountHero");
   const sidebarSubtitle = el("sidebarSubtitle");
@@ -206,6 +207,7 @@ function configureAccountIdentity() {
     renderPortalLandingForRole();
   } else if (currentRole === "franciza") {
     document.body.classList.remove("role-suport");
+    document.body.classList.add("role-franciza");
     badge.textContent = "FRANCIZĂ";
     badge.dataset.role = "franciza";
     el("equipmentPageTitle").textContent = "FRANCIZĂ";
@@ -213,6 +215,7 @@ function configureAccountIdentity() {
     if (hero) hero.innerHTML = "";
   } else {
     document.body.classList.remove("role-suport");
+    document.body.classList.add("role-carrefour");
     badge.textContent = "CARREFOUR";
     badge.dataset.role = "carrefour";
     el("equipmentPageTitle").textContent = "CARREFOUR";
@@ -240,7 +243,7 @@ async function finishLogin() {
 
   el("loginPage").style.display = "none";
   el("app").classList.remove("hidden");
-  el("menuBtn").classList.remove("hidden");
+  el("menuBtn").classList.toggle("hidden", currentRole === "carrefour" || currentRole === "franciza");
   document.querySelectorAll('[data-permission="add"]').forEach(x => x.classList.toggle("hidden", !currentCanAdd));
   document.querySelectorAll('[data-permission="manage"]').forEach(x => x.classList.toggle("hidden", !currentCanManage));
   document.querySelectorAll('[data-permission="users"]').forEach(x => x.classList.toggle("hidden", !isPrimaryAdmin()));
@@ -402,104 +405,46 @@ function renderPortalLandingForRole() {
   landing.classList.remove("hidden");
 
   const allSections = [
-    {
-      category: "carrefour",
-      title: "CARREFOUR",
-      logo: "carrefour-logo.svg",
-      visualClass: "support-card-carrefour"
-    },
-    {
-      category: "franciza",
-      title: "FRANCIZĂ",
-      logo: "carrefour-express-verde-vertical.png",
-      visualClass: "support-card-franciza"
-    },
-    {
-      category: "suport",
-      title: "SUPORT INTERN",
-      logo: "smartid-logo-user.png",
-      visualClass: "support-card-intern"
-    }
+    { category:"carrefour", title:"CARREFOUR", logo:"carrefour-logo.svg" },
+    { category:"franciza", title:"FRANCIZĂ", logo:"carrefour-express-verde-vertical.png" },
+    { category:"suport", title:"SUPORT INTERN", logo:"smartid-logo-user.png" }
   ];
-
   let sections = allSections;
   if (currentRole === "carrefour") sections = allSections.filter(s => s.category === "carrefour");
   if (currentRole === "franciza") sections = allSections.filter(s => s.category === "franciza");
 
-  landing.innerHTML = `
-    <div class="support-zone-stack ${sections.length === 1 ? "single-zone" : ""}">
-      ${sections.map(section => {
-        let equipment = EQUIPMENT[section.category] || [];
-
-        // În pagina Suport, SGR nu apare în Franciză.
-        if (currentRole === "suport" && section.category === "franciza") {
-          equipment = equipment.filter(item => item.id !== "sgr");
-        }
-
-        const typeBlocks = [
-          { type:"videoclip", label:"Videoclipuri", icon:"▶", iconClass:"type-video" },
-          { type:"procedura", label:"Proceduri", icon:"▤", iconClass:"type-procedure" }
-        ];
-
-        return `
-          <section class="support-zone-card ${section.visualClass}">
-            <div class="support-zone-visual">
-              <div class="support-zone-glow"></div>
-              <img src="${section.logo}" alt="${section.title}">
-            </div>
-
-            <div class="support-zone-content">
-              <div class="support-zone-title">
-                <h3>${section.title}</h3>
-              </div>
-
-              <div class="support-type-list">
-                ${typeBlocks.map((block, index) => {
-                  const total = equipment.reduce((sum, item) =>
-                    sum + supportMaterialsFor(section.category, item.id, block.type).length, 0);
-
-                  return `
-                    <div class="support-type-group">
-                      <button type="button" class="support-type-row" data-type-toggle>
-                        <span class="support-type-icon ${block.iconClass}">${block.icon}</span>
-                        <span class="support-type-name">${block.label}</span>
-                        <span class="support-type-total">${total}</span>
-                        <span class="support-type-arrow">⌄</span>
-                      </button>
-
-                      <div class="support-type-equipment">
-                        ${equipment.map(item => {
-                          const count = supportMaterialsFor(section.category, item.id, block.type).length;
-                          return `
-                            <button type="button"
-                                    class="support-equipment-row support-equipment-subrow"
-                                    data-support-category="${section.category}"
-                                    data-support-equipment="${item.id}"
-                                    data-support-label="${escapeHtml(item.label)}"
-                                    data-support-type="${block.type}">
-                              <span class="support-equipment-icon">${item.icon}</span>
-                              <span class="support-equipment-name">${escapeHtml(item.label)}</span>
-                              <span class="support-count">${count} ${block.type === "videoclip" ? "videoclipuri" : "proceduri"}</span>
-                              <span class="support-row-arrow">›</span>
-                            </button>`;
-                        }).join("")}
-                      </div>
-                    </div>`;
-                }).join("")}
-              </div>
-            </div>
-          </section>`;
-      }).join("")}
-    </div>
-  `;
+  landing.innerHTML = `<div class="user-clean-stack">${sections.map(section => {
+    let equipment = EQUIPMENT[section.category] || [];
+    if (currentRole === "suport" && section.category === "franciza") equipment = equipment.filter(item => item.id !== "sgr");
+    const blocks=[
+      {type:"videoclip",label:"Videoclipuri",icon:"▶"},
+      {type:"procedura",label:"Proceduri",icon:"▤"}
+    ];
+    return `<section class="user-clean-zone">
+      <div class="user-clean-brand"><img src="${section.logo}" alt="${section.title}"></div>
+      <div class="user-clean-content">
+        <h3>${section.title}</h3>
+        <div class="user-clean-types">${blocks.map(block=>{
+          const total=equipment.reduce((sum,item)=>sum+supportMaterialsFor(section.category,item.id,block.type).length,0);
+          return `<div class="user-clean-group">
+            <button type="button" class="user-clean-type" data-type-toggle>
+              <span class="user-clean-icon">${block.icon}</span><span>${block.label}</span><b>${total}</b><i>⌄</i>
+            </button>
+            <div class="user-clean-equipment">${equipment.map(item=>{
+              const count=supportMaterialsFor(section.category,item.id,block.type).length;
+              return `<button type="button" class="user-clean-equipment-row" data-support-category="${section.category}" data-support-equipment="${item.id}" data-support-label="${escapeHtml(item.label)}" data-support-type="${block.type}">
+                <span>${item.icon}</span><strong>${escapeHtml(item.label)}</strong><small>${count}</small><i>›</i>
+              </button>`;
+            }).join('')}</div>
+          </div>`;
+        }).join('')}</div>
+      </div>
+    </section>`;
+  }).join('')}</div>`;
 
   landing.querySelectorAll("[data-type-toggle]").forEach(button => {
-    button.onclick = () => {
-      const group = button.closest(".support-type-group");
-      group?.classList.toggle("open");
-    };
+    button.onclick = () => button.closest(".user-clean-group")?.classList.toggle("open");
   });
-
   landing.querySelectorAll("[data-support-equipment]").forEach(button => {
     button.onclick = () => {
       selectedBrowseCategory = button.dataset.supportCategory || currentCategory;
@@ -511,7 +456,6 @@ function renderPortalLandingForRole() {
     };
   });
 }
-
 function openSupportDocsModal(category, equipmentId, label, selectedType = "") {
   const modal = el("supportDocsModal");
   if (!modal) return;
@@ -648,7 +592,7 @@ function renderSelectedMaterials() {
   });
 
   el("materialsTitle").textContent = selectedMaterialType === "videoclip" ? "Videoclipuri" : "Proceduri";
-  el("materialsSubtitle").textContent = `${selectedEquipmentLabel} · în ordinea celor mai vizionate`;
+  el("materialsSubtitle").textContent = selectedEquipmentLabel;
 
   const makeCard = (material, position) => {
     const yt = youtubeId(material.url || "");
@@ -691,8 +635,7 @@ function driveSamePageUrl(raw) {
     if (u.hostname.includes("drive.google.com")) {
       const m = u.pathname.match(/\/file\/d\/([^/]+)/);
       if (m) {
-        const download = `https://drive.google.com/uc?export=download&id=${m[1]}`;
-        return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(download)}`;
+        return `https://drive.google.com/file/d/${m[1]}/preview`;
       }
     }
   } catch {}
@@ -704,12 +647,42 @@ async function openViewer(material) {
   const yt = youtubeId(material.url || "");
   el("viewerFrame").src = material.type === "videoclip" && yt ? `https://www.youtube-nocookie.com/embed/${yt}?rel=0&cc_load_policy=0&playsinline=1` : driveSamePageUrl(material.url || "about:blank");
   el("viewer").classList.add("open");
+  loadViewerEngagement();
   try {
     await addDoc(collection(db,"materialViews"),{materialId:material.id,title:material.title||"",type:material.type,email:currentEmail,storeId:currentStoreId,storeName:currentStoreName,storeFormat:currentStoreFormat,createdAt:serverTimestamp()});
     await updateDoc(doc(db,"videos",material.id),{views:increment(1)}); material.views=Number(material.views||0)+1;
   } catch(error){console.warn("Vizualizarea nu a putut fi înregistrată.",error);}
 }
 
+
+async function loadViewerEngagement(){
+  if(!currentOpenMaterial) return;
+  const id=String(currentOpenMaterial.id||"");
+  try{
+    const [rSnap,cSnap]=await Promise.all([getDocs(collection(db,"materialReactions")),getDocs(collection(db,"materialComments"))]);
+    const reactions=rSnap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>String(x.materialId||"")===id);
+    const comments=cSnap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>String(x.materialId||"")===id).sort((a,b)=>valueToMillis(a.createdAt)-valueToMillis(b.createdAt));
+    el("likeCount").textContent=reactions.filter(x=>x.value==="like").length;
+    el("unlikeCount").textContent=reactions.filter(x=>x.value==="unlike").length;
+    el("commentCount").textContent=comments.length;
+    el("commentsList").innerHTML=comments.length?comments.map(x=>`<div class="comment-row"><b>${escapeHtml(displayUser(x.email||"Utilizator"))}</b><span>${escapeHtml(x.text||"")}</span></div>`).join(""):`<div class="comment-empty">Nu există comentarii încă.</div>`;
+  }catch(e){console.warn("Interacțiunile nu au putut fi încărcate",e)}
+}
+async function setMaterialReaction(value){
+  if(!currentOpenMaterial) return;
+  try{
+    const snap=await getDocs(collection(db,"materialReactions"));
+    const mine=snap.docs.find(d=>String(d.data().materialId||"")===String(currentOpenMaterial.id||"") && String(d.data().email||"").toLowerCase()===String(currentEmail||"").toLowerCase());
+    if(mine) await setDoc(doc(db,"materialReactions",mine.id),{...mine.data(),value,createdAt:serverTimestamp()});
+    else await addDoc(collection(db,"materialReactions"),{materialId:currentOpenMaterial.id,email:currentEmail,value,createdAt:serverTimestamp()});
+    await loadViewerEngagement();
+  }catch(e){console.warn("Reacția nu a putut fi salvată",e)}
+}
+async function addMaterialComment(){
+  const input=el("commentInput"); const text=(input?.value||"").trim();
+  if(!currentOpenMaterial||!text) return;
+  try{await addDoc(collection(db,"materialComments"),{materialId:currentOpenMaterial.id,email:currentEmail,text,createdAt:serverTimestamp()});input.value="";await loadViewerEngagement()}catch(e){console.warn("Comentariul nu a putut fi salvat",e)}
+}
 function renderEquipmentChoices() {
   for (const category of ["carrefour", "franciza", "suport"]) {
     el(`${category}EquipmentChoices`).innerHTML = EQUIPMENT[category].map(item => `
@@ -864,7 +837,7 @@ async function renderAdminMaterials() {
           <button class="secondary edit-material-btn" data-edit-material="${material.id}">✏️ Editează</button>
           ${isPrimaryAdmin() && (material.status || "approved") !== "approved" ? `<button class="primary" data-approve-material="${material.id}">✓ Aprobă</button>` : ""}
           ${isPrimaryAdmin() && (material.status || "approved") !== "rejected" ? `<button class="secondary" data-reject-material="${material.id}">Respinge</button>` : ""}
-          ${isPrimaryAdmin() ? `<button class="danger" data-delete-material="${material.id}">Șterge</button>` : ""}
+          ${isPrimaryAdmin() ? `<button class="secondary material-action" data-delete-material="${material.id}">Șterge</button>` : ""}
         </div>
       </div>
     `;
@@ -1213,7 +1186,7 @@ async function loadStores() {
 
 function renderStores() {
   const term = el("storeSearch").value.trim().toLowerCase();
-  const filter = el("storeFilter").value;
+  const filter = el("storeFilter")?.value || "all";
 
   const filtered = storesCache.filter(store => {
     const category = normCategory(store.category || store.type);
@@ -1552,6 +1525,10 @@ el("menuBtn").addEventListener("click", openMenu);
 el("shareWhatsAppBtn").addEventListener("click", shareWhatsApp);
 el("shareEmailBtn").addEventListener("click", shareEmail);
 el("copyLinkBtn").addEventListener("click", copyMaterialLink);
+onIfPresent("likeMaterialBtn","click",()=>setMaterialReaction("like"));
+onIfPresent("unlikeMaterialBtn","click",()=>setMaterialReaction("unlike"));
+onIfPresent("addCommentBtn","click",addMaterialComment);
+onIfPresent("commentInput","keydown",e=>{if(e.key==="Enter") addMaterialComment();});
 
 onIfPresent("closeSharesModalBtn", "click", () => el("sharesModal")?.classList.remove("open"));
 el("closeMenuBtn").addEventListener("click", closeMenu);
@@ -1573,7 +1550,7 @@ el("saveStoreBtn").addEventListener("click", saveStore);
 el("closeStoreEditor")?.addEventListener("click",()=>el("storeEditorPanel")?.classList.add("hidden"));
 el("newStoreCategory").addEventListener("change", toggleStoreFormat);
 el("storeSearch").addEventListener("input", renderStores);
-el("storeFilter").addEventListener("change", renderStores);
+el("storeFilter")?.addEventListener("change", renderStores);
 el("searchInput").addEventListener("input", () => {
   if (!el("materialsPage").classList.contains("hidden")) renderSelectedMaterials();
 });
@@ -1700,14 +1677,14 @@ function v8Rows(type){
  const {sessions,views,shares}=dashboardDetailCache;
  if(type==='logins')return [...sessions].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt)).map(x=>({t:displayUser(x.email),d:x.storeName?`${x.storeName}${x.storeId?` · ID ${x.storeId}`:''}`:(x.role||''),w:dashboardTimestamp(x.createdAt)}));
  if(type==='stores'){const m=new Map();sessions.forEach(x=>{if(!x.storeId&&!x.storeName)return;const k=x.storeId||x.storeName,v=m.get(k)||{name:x.storeName||'Magazin',id:x.storeId||'',count:0,last:x.createdAt};v.count++;if(valueToMillis(x.createdAt)>valueToMillis(v.last))v.last=x.createdAt;m.set(k,v)});return [...m.values()].sort((a,b)=>b.count-a.count).map(x=>({t:`${x.name}${x.id?` · ID ${x.id}`:''}`,d:`${x.count} autentificări`,w:`Ultima: ${dashboardTimestamp(x.last)}`}));}
- if(type==='videos')return topVideoStats(views).map((x,i)=>({t:`${i+1}. ${x.title}`,d:`${x.count} vizualizări · ${x.users.size} utilizatori${x.stores.size?` · ${x.stores.size} magazine`:''}`,w:`Ultima: ${dashboardTimestamp(x.last)}`}));
- if(type==='procedures')return [...views].filter(x=>normType(x.type)==='procedura').sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt)).map(x=>({t:x.title||'Procedură',d:`${displayUser(x.email)}${x.storeName?` · ${x.storeName}`:''}`,w:dashboardTimestamp(x.createdAt)}));
+ if(type==='videos')return topVideoStats(views).slice(0,10).map((x,i)=>({t:`#${i+1} · ${x.title}`,d:`${x.count} vizualizări · ${x.users.size} utilizatori${x.stores.size?` · ${x.stores.size} magazine`:''}`,w:`Ultima vizualizare: ${dashboardTimestamp(x.last)}`}));
+ if(type==='procedures'){const m=new Map();views.filter(x=>normType(x.type)==='procedura').forEach(x=>{const k=String(x.title||'Procedură').trim()||'Procedură',v=m.get(k)||{title:k,count:0,last:null,users:new Set(),stores:new Set()};v.count++;if(x.email)v.users.add(displayUser(x.email));if(x.storeName)v.stores.add(x.storeName);if(!v.last||valueToMillis(x.createdAt)>valueToMillis(v.last))v.last=x.createdAt;m.set(k,v)});return [...m.values()].sort((a,b)=>b.count-a.count||valueToMillis(b.last)-valueToMillis(a.last)).slice(0,10).map((x,i)=>({t:`#${i+1} · ${x.title}`,d:`${x.count} vizualizări · ${x.users.size} utilizatori${x.stores.size?` · ${x.stores.size} magazine`:''}`,w:`Ultima vizualizare: ${dashboardTimestamp(x.last)}`}));}
  return [...shares].sort((a,b)=>valueToMillis(b.createdAt)-valueToMillis(a.createdAt)).map(x=>({t:x.title||'Material',d:`${displayUser(x.email)} · ${x.method||x.channel||'Distribuire'}`,w:dashboardTimestamp(x.createdAt)}));
 }
 function toggleV8Stat(type,card){
  const box=document.getElementById('statInlineDetails'), rows=v8Rows(type); if(!box)return;
  if(box.dataset.open===type&&!box.classList.contains('hidden')){box.classList.add('hidden');box.dataset.open='';return;}
- const titles={logins:'Autentificări',stores:'Magazine active',videos:'Top 10 videoclipuri',procedures:'Vizualizări proceduri',shares:'Distribuiri'};
+ const titles={logins:'Autentificări',stores:'Magazine active',videos:'Top 10 videoclipuri',procedures:'Top 10 proceduri',shares:'Distribuiri'};
  box.dataset.open=type;box.classList.remove('hidden');box.innerHTML=`<div class="stat-inline-head"><h2>${titles[type]}</h2><button class="inline-text-action" id="v8ExportStat">Export Excel ↗</button></div><div class="stat-inline-list">${rows.length?rows.map(r=>`<div class="stat-inline-row"><b>${escapeHtml(r.t)}</b><span>${escapeHtml(r.d)}</span><small>${escapeHtml(r.w)}</small></div>`).join(''):'<div class="empty">Nu există încă informații.</div>'}</div>`;
  document.getElementById('v8ExportStat').onclick=e=>{e.stopPropagation();exportDashboardExcel(`${titles[type].replace(/\s+/g,'_')}_SmartID.xls`,['Element','Detalii','Data/Ora'],rows.map(r=>[r.t,r.d,r.w]));};
  box.scrollIntoView({behavior:'smooth',block:'nearest'});
