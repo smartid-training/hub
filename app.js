@@ -1772,3 +1772,45 @@ renderV8Team=function(){
  const exp=document.getElementById('v8TeamExport'); if(exp) exp.onclick=e=>{e.stopPropagation();exportDashboardExcel('Activitate_echipa_SmartID.xls',['Utilizator','Acțiune','Material','Tip','Data/Ora'],acts.map(a=>[displayUser(a.email),v8ActionLabel(a.action),a.title||'',a.type||'',dashboardTimestamp(a.createdAt)]));};
 };
 setInterval(renderTeamCollapsedPreview,900);
+
+// v16 final requested behavior
+function v16DailySeries(items, dateField='createdAt', days=7, filterFn=null){
+  const now=new Date(), out=[];
+  for(let i=days-1;i>=0;i--){const d=new Date(now);d.setHours(0,0,0,0);d.setDate(d.getDate()-i);const e=new Date(d);e.setDate(e.getDate()+1);out.push(items.filter(x=>(!filterFn||filterFn(x))&&valueToMillis(x[dateField])>=d.getTime()&&valueToMillis(x[dateField])<e.getTime()).length)}
+  return out;
+}
+function v16RenderMiniCharts(){
+  const {sessions=[],views=[],shares=[]}=dashboardDetailCache;
+  const series={
+    'card-logins':v16DailySeries(sessions),
+    'card-stores':v16DailySeries(sessions),
+    'card-videos':v16DailySeries(views,'createdAt',7,x=>normType(x.type)==='videoclip'),
+    'card-procedures':v16DailySeries(views,'createdAt',7,x=>normType(x.type)==='procedura'),
+    'card-shares':v16DailySeries(shares)
+  };
+  Object.entries(series).forEach(([cls,vals])=>{const box=document.querySelector('.'+cls+' .metric-mini-chart');if(!box)return;const max=Math.max(1,...vals);box.innerHTML=vals.map(v=>`<i style="height:${Math.max(12,Math.round(v/max*100))}%" title="${v}"></i>`).join('')});
+}
+const _v16RenderTop=renderV8TopFive;
+renderV8TopFive=function(){
+  const list=document.getElementById('topFiveInlineList'); if(!list)return;
+  const top=topVideoStats(dashboardDetailCache.views||[]).slice(0,10);
+  list.innerHTML=top.length?top.map((x,i)=>`<div class="top-five-item" data-video-rank="${i}"><div class="top-five-rank">#${i+1}</div><div class="top-five-title">${escapeHtml(x.title)}</div><div class="top-five-meta">${x.count} vizualizări · ${x.users.size} utilizatori${x.stores.size?` · ${x.stores.size} magazine`:''}</div></div>`).join(''):'<div class="empty">Nu există încă vizualizări.</div>';
+  list.querySelectorAll('[data-video-rank]').forEach(elm=>elm.onclick=()=>toggleV8Stat('videos',document.querySelector('.card-videos')));
+  const b=document.getElementById('exportTop5Inline'); if(b)b.onclick=e=>{e.stopPropagation();exportDashboardExcel('Top_10_videoclipuri_SmartID.xls',['Loc','Videoclip','Vizualizări','Utilizatori','Magazine','Ultima vizualizare'],top.map((x,i)=>[i+1,x.title,x.count,[...x.users].join(', '),[...x.stores].join(', '),dashboardTimestamp(x.last)]));};
+  v16RenderMiniCharts();
+};
+// aggregate procedures so each procedure has a meaningful counter
+const _v8RowsBeforeV16=v8Rows;
+v8Rows=function(type){
+  if(type!=='procedures') return _v8RowsBeforeV16(type);
+  const map=new Map();
+  (dashboardDetailCache.views||[]).filter(x=>normType(x.type)==='procedura').forEach(x=>{const k=String(x.title||'Procedură').trim()||'Procedură';const v=map.get(k)||{title:k,count:0,last:null,users:new Set(),stores:new Set()};v.count++;if(x.email)v.users.add(displayUser(x.email));if(x.storeName)v.stores.add(x.storeName);if(!v.last||valueToMillis(x.createdAt)>valueToMillis(v.last))v.last=x.createdAt;map.set(k,v)});
+  return [...map.values()].sort((a,b)=>b.count-a.count).map((x,i)=>({t:`${i+1}. ${x.title}`,d:`${x.count} accesări · ${x.users.size} utilizatori${x.stores.size?` · ${x.stores.size} magazine`:''}`,w:`Ultima: ${dashboardTimestamp(x.last)}`}));
+};
+// add store button: keep add above edit and edit only when selected
+const addStoreBtn=document.getElementById('addStoreBtn');
+if(addStoreBtn)addStoreBtn.addEventListener('click',()=>{const panel=document.getElementById('storeEditorPanel');panel?.classList.remove('hidden');panel?.querySelector('h2')&&(panel.querySelector('h2').textContent='Adăugare magazin');['newStoreId','newStoreName'].forEach(id=>{const n=document.getElementById(id);if(n)n.value=''});if(document.getElementById('newStoreCategory'))document.getElementById('newStoreCategory').value='carrefour';if(document.getElementById('newStoreFormat'))document.getElementById('newStoreFormat').value='hiper';if(document.getElementById('newStoreActive'))document.getElementById('newStoreActive').value='true';document.getElementById('newStoreId')?.focus();});
+// keep edit title explicit
+const _editStoreV16=editStore;
+editStore=function(storeId){_editStoreV16(storeId);const h=document.querySelector('#storeEditorPanel h2');if(h)h.textContent='Editare magazin';};
+setInterval(v16RenderMiniCharts,1200);

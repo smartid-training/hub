@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SmartID Portal</title>
-  <link rel="icon" type="image/png" href="smartid-favicon.png?v=13">
+  <link rel="icon" type="image/png" href="smartid-favicon.png?v=1710-logo-confirmat">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -39,7 +42,7 @@
     <header class="topbar">
       <div class="brand-row">
         <button id="menuBtn" class="menu-btn hidden" aria-label="Meniu">☰</button>
-        <img src="smartid-logo-user.png" alt="SmartID" class="topbar-smartid-original">
+        <img src="smartid-logo-user.png?v=1710-logo-confirmat" alt="SmartID" class="topbar-smartid-original">
         <strong class="brand">Portal</strong>
       </div>
       <div class="top-actions">
@@ -77,58 +80,58 @@
         </div>
 
         <div class="dashboard-pro-list">
-          <article class="dashboard-pro-card card-logins">
+          <article class="dashboard-pro-card card-logins" data-stat-details="logins" tabindex="0">
             <div class="metric-icon">👥</div>
             <div class="metric-copy">
               <strong id="statLogins">0</strong>
               <h3>Autentificări</h3>
               <p>Arată de câte ori s-au autentificat utilizatorii în SmartID Portal.</p>
             </div>
-            <div class="metric-line" aria-hidden="true"></div>
+            <div class="metric-mini-chart" aria-hidden="true"></div><div class="metric-line" aria-hidden="true"></div>
             
           </article>
 
-          <article class="dashboard-pro-card card-stores">
+          <article class="dashboard-pro-card card-stores" data-stat-details="stores" tabindex="0">
             <div class="metric-icon">🏪</div>
             <div class="metric-copy">
               <strong id="statStores">0</strong>
               <h3>Magazine active</h3>
               <p>Află câte magazine distincte au accesat portalul.</p>
             </div>
-            <div class="metric-line" aria-hidden="true"></div>
+            <div class="metric-mini-chart" aria-hidden="true"></div><div class="metric-line" aria-hidden="true"></div>
             
           </article>
 
-          <article class="dashboard-pro-card card-videos">
+          <article class="dashboard-pro-card card-videos" data-stat-details="videos" tabindex="0">
             <div class="metric-icon">▶</div>
             <div class="metric-copy">
               <strong id="statVideos">0</strong>
               <h3>Top 10 videoclipuri</h3>
               <p id="topVideoPreview">Cele mai vizionate videoclipuri din portal.</p>
             </div>
-            <div class="metric-line" aria-hidden="true"></div>
+            <div class="metric-mini-chart" aria-hidden="true"></div><div class="metric-line" aria-hidden="true"></div>
             
           </article>
 
-          <article class="dashboard-pro-card card-procedures">
+          <article class="dashboard-pro-card card-procedures" data-stat-details="procedures" tabindex="0">
             <div class="metric-icon">▤</div>
             <div class="metric-copy">
               <strong id="statProcedures">0</strong>
               <h3>Vizualizări proceduri</h3>
               <p>Arată numărul total de accesări ale procedurilor.</p>
             </div>
-            <div class="metric-line" aria-hidden="true"></div>
+            <div class="metric-mini-chart" aria-hidden="true"></div><div class="metric-line" aria-hidden="true"></div>
             
           </article>
 
-          <article class="dashboard-pro-card card-shares">
+          <article class="dashboard-pro-card card-shares" data-stat-details="shares" tabindex="0">
             <div class="metric-icon">↧</div>
             <div class="metric-copy">
               <strong id="statShares">0</strong>
               <h3>Distribuiri</h3>
               <p>Arată de câte ori au fost distribuite materialele din portal.</p>
             </div>
-            <div class="metric-line" aria-hidden="true"></div>
+            <div class="metric-mini-chart" aria-hidden="true"></div><div class="metric-line" aria-hidden="true"></div>
             
           </article>
 
@@ -271,12 +274,13 @@
             <option value="Dan Oros">Dan Oros</option>
             <option value="Valentin Surugiu">Valentin Surugiu</option>
           </select>
-          <input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Utilizator intern</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option><option value="suport">Suport</option></select><label><input id="userCanAdd" type="checkbox"> Poate adăuga materiale</label><label><input id="userCanManage" type="checkbox"> Poate edita/șterge materiale</label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
+          <input id="userEmail" placeholder="Email coleg"><select id="userRole"><option value="suport">Utilizator intern</option><option value="carrefour">User Carrefour</option><option value="franciza">User Franciză</option></select><select id="userCategory"><option value="all">Toate categoriile</option><option value="carrefour">Carrefour</option><option value="franciza">Franciză</option><option value="suport">Suport</option></select><label class="permission-toggle"><span>Poate adăuga materiale</span><input id="userCanAdd" type="checkbox"></label><label class="permission-toggle"><span>Poate edita/șterge materiale</span><input id="userCanManage" type="checkbox"></label></div><button id="saveUserBtn" class="primary">Salvează drepturi</button><div id="userStatus" class="status"></div></section>
         <section class="panel"><h2>Conturi configurate</h2><div id="usersList"></div></section>
       </section>
 
       <section id="storesPage" class="page hidden">
         <div class="page-head"><div><h1>Administrare magazine</h1><p class="subtitle">Adaugă, caută și filtrează magazinele.</p></div></div>
+        <div class="store-add-toolbar"><button id="addStoreBtn" type="button" class="primary">＋ Adaugă magazin</button></div>
         <section id="storeEditorPanel" class="panel hidden store-editor-panel">
           <div class="store-editor-head"><div><h2>Editare magazin</h2><p>Modifică datele magazinului selectat.</p></div><button id="closeStoreEditor" type="button" class="secondary">Închide</button></div>
           <div class="form-grid">
@@ -361,7 +365,7 @@
     </section>
   </div>
 
-  <script type="module" src="app.js?v=final-notite-2509"></script>
+  <script type="module" src="app.js?v=1610-final"></script>
 
   <div id="dashboardDetailsModal" class="modal">
     <section class="modal-card dashboard-details-modal">
