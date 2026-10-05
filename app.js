@@ -421,7 +421,7 @@ function renderPortalLandingForRole() {
       {type:"procedura",label:"Proceduri",icon:"▤"}
     ];
     return `<section class="user-clean-zone">
-      <div class="user-clean-brand"><img src="${section.logo}" alt="${section.title}"></div>
+      <div class="user-clean-brand ${section.category === "suport" ? "user-clean-brand-smartid" : ""}"><img src="${section.logo}" alt="${section.title}">${section.category === "suport" ? `<span class="smartid-support-word"><strong>SMART</strong><b>ID</b></span>` : ""}</div>
       <div class="user-clean-content">
         <h3>${section.title}</h3>
         <div class="user-clean-types">${blocks.map(block=>{
@@ -1540,7 +1540,7 @@ el("closeViewerBtn").addEventListener("click", () => {
   // Pentru utilizatorii portalului, revenirea dintr-un clip/procedură trebuie să ducă
   // întotdeauna în meniul principal de echipamente, nu într-o pagină intermediară goală.
   if (currentRole !== "admin") {
-    renderEquipment();
+    renderPortalLandingForRole();
     showPage("equipmentPage");
   }
 });
@@ -1593,7 +1593,15 @@ document.querySelectorAll(".type-card").forEach(card => {
 });
 
 document.querySelectorAll("[data-back]").forEach(button => {
-  button.addEventListener("click", () => showPage(button.dataset.back));
+  button.addEventListener("click", () => {
+    // In conturile client, Back din orice nivel de materiale revine direct la pagina principala.
+    if (currentRole !== "admin") {
+      renderPortalLandingForRole();
+      showPage("equipmentPage");
+      return;
+    }
+    showPage(button.dataset.back);
+  });
 });
 
 onIfPresent("detectLocationBtn", "click", recommendStoreByLocation);
