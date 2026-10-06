@@ -61,9 +61,15 @@ async function loadUserNameMap() {
   } catch { usersNameMap = new Map(); }
 }
 function displayUser(email) {
-  const key=String(email||"").toLowerCase();
-  if (key === PRIMARY_ADMIN_EMAIL) return "Admin principal";
-  return usersNameMap.get(key) || email || "Necunoscut";
+  const raw=String(email||"").trim();
+  const key=raw.toLowerCase();
+  if (key === PRIMARY_ADMIN_EMAIL) return "Admin";
+  const saved=usersNameMap.get(key);
+  if (saved && saved !== raw) return saved;
+  const local=(key.split("@")[0]||"").trim();
+  if (local === "suport" || local === "support") return "Suport";
+  const pretty=local.replace(/[._-]+/g," ").replace(/\b\w/g,c=>c.toUpperCase()).trim();
+  return pretty || raw || "Necunoscut";
 }
 
 const isPrimaryAdmin = () => currentEmail.toLowerCase() === PRIMARY_ADMIN_EMAIL;
